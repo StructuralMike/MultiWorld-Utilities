@@ -770,7 +770,7 @@ def patch_rom(world, rom, player, team, enemized):
         rom.write_byte(0x138002, 2)
         for name, layout in world.key_layout[player].items():
             offset = compass_data[name][4]//2
-            if world.retro[player]:
+            if world.keyshuffle[player] == "universal":
                 rom.write_byte(0x13f030+offset, layout.max_chests + layout.max_drops)
             else:
                 rom.write_byte(0x13f020+offset, layout.max_chests + layout.max_drops)  # not currently used
