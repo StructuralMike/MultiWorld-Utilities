@@ -185,12 +185,12 @@ def main(args, seed=None, fish=None):
     logger.info(world.fish.translate("cli","cli","shuffling.dungeons"))
 
     for player in range(1, world.players + 1):
+        logger.info(f'Generating Dungeon layout for {world.player_names[player]} ({player}/{world.players})')
         link_doors(world, player)
         if world.mode[player] != 'inverted':
             mark_light_world_regions(world, player)
         else:
             mark_dark_world_regions(world, player)
-    logger.info(world.fish.translate("cli","cli","generating.itempool"))
     logger.info(world.fish.translate("cli","cli","generating.itempool"))
 
     for player in range(1, world.players + 1):
