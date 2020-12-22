@@ -273,7 +273,7 @@ def main(args, seed=None, fish=None):
     def _get_enemizer(player: int):
         return (world.boss_shuffle[player] != 'none' or world.enemy_shuffle[player]
                 or world.enemy_health[player] != 'default' or world.enemy_damage[player] != 'default'
-                or world.bush_shuffle[player] or world.killable_thieves[player] or world.tile_shuffle[player])
+                or world.bush_shuffle[player] or world.killable_thieves[player])
 
     def _gen_rom(team: int, player: int):
         enemized = False
