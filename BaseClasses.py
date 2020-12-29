@@ -2243,8 +2243,9 @@ class Spoiler(object):
                 # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
                 # items: Item names
                 outfile.write('\n\nUnreachable Items:\n\n')
-                outfile.write('\n'.join(['%s: %s' % (self.world.fish.translate("meta", "items", unreachable.item.name),
-                                                     self.world.fish.translate("meta", "locations", unreachable.name))
+                outfile.write('\n'.join(['%s: %s (%s)' % (self.world.fish.translate("meta", "items", unreachable.item.name),
+                                                     self.world.fish.translate("meta", "locations", unreachable.name),
+                                                          self.world.get_player_names(unreachable.item.player))
                                          for unreachable in self.unreachables]))
 
             # rooms: Change up room names; only if it's got no locations in it
