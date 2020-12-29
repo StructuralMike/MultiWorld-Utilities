@@ -460,7 +460,11 @@ def main(args, seed=None, fish=None):
                 multidatatags.append("Spoiler")
                 if not args.skip_playthrough:
                     multidatatags.append("Play through")
-            minimum_versions = {"server": (1,0,0)}
+            minimum_versions = {"server": (3, 3, 0) if any(world.keydropshuffle.values()) else (1, 0, 0)}
+            minimum_versions["clients"] = client_versions = []
+            for (slot, team, name) in rom_names:
+                if world.keydropshuffle[slot]:
+                    client_versions.append([team, slot, [3, 3, 0]])
             multidata = zlib.compress(json.dumps({"names": parsed_names,
                                                   # backwards compat for < 2.4.1
                                                   "roms": [(slot, team, list(name.encode()))
