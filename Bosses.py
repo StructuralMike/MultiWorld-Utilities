@@ -214,7 +214,7 @@ def place_bosses(world, player: int):
                                       'chaos': 'random',
                                       'singularity': 'singularity',
                                       'duality': 'singularity'
-                                      }[world.boss_shuffle[player]]
+                                      }.get(world.boss_shuffle[player], world.boss_shuffle[player])
     except KeyError:
         raise FillError(f"Could not find boss shuffle mode {world.boss_shuffle[player]}")
 
