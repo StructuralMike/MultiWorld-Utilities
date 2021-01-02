@@ -99,6 +99,9 @@ multi_mystery_options:
   zip_format: 1
   # Create encrypted race roms
   race: 0
+  # List of options that can be plando'd. Can be combined, for example "bosses, items"
+  # Available options: bosses
+  plando_options: "bosses"
   ##Doors options
   # How many cpu threads should be used to roll seeds in parallel.
   # set to 0 for it to mimic the amount of hardware threads you have, otherwise use a positive number to set the max number of threads in parallel to limit resources used.
