@@ -160,13 +160,14 @@ class World(object):
             set_player_attr('dark_room_logic', "lamp")
             set_player_attr('restrict_dungeon_item_on_boss', False)
             set_player_attr('plando_items', [])
+            set_player_attr('plando_texts', {})
             set_player_attr('potshuffle', False)
             set_player_attr('pot_contents', None)
 
             set_player_attr('keydropshuffle', False)
             set_player_attr('mixed_travel', 'prevent')
             set_player_attr('standardize_palettes', 'standardize')
-            set_player_attr('force_fix', {'gt': False, 'sw': False, 'pod': False, 'tr': False});
+            set_player_attr('force_fix', {'gt': False, 'sw': False, 'pod': False, 'tr': False})
 
     def secure(self):
         self.random = secrets.SystemRandom()
