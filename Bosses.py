@@ -180,7 +180,7 @@ def place_boss(world, player: int, boss: str, location: str, level: Optional[str
     if level:
         location = [x.name for x in world.dungeons if x.player == player and level in x.bosses.keys()][0]
         loc_text = location + ' (' + level + ')'
-    logging.info('Placing boss %s at %s', boss, loc_text)
+    logging.debug('Placing boss %s at %s', boss, loc_text)
     world.get_dungeon(location, player).bosses[level] = BossFactory(boss, player)
 
 
