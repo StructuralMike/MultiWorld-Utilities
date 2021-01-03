@@ -107,6 +107,7 @@ def main(args, seed=None, fish=None):
     world.plando_texts = args.plando_texts.copy()
     world.plando_connections = args.plando_connections.copy()
     world.restrict_dungeon_item_on_boss = args.restrict_dungeon_item_on_boss.copy()
+    world.required_medallions = args.required_medallions.copy()
     world.potshuffle = args.shufflepots.copy()
     world.keydropshuffle = args.keydropshuffle.copy()
     world.mixed_travel = args.mixed_travel.copy()
