@@ -15,7 +15,7 @@ from KeyDoorShuffle import validate_key_placement
 from PotShuffle import shuffle_pots
 from Regions import create_regions, create_shops, mark_light_world_regions, lookup_vanilla_location_to_entrance, create_dungeon_regions, adjust_locations
 from InvertedRegions import create_inverted_regions, mark_dark_world_regions
-from EntranceShuffle import link_entrances, link_inverted_entrances
+from EntranceShuffle import link_entrances, link_inverted_entrances, plando_connect
 from Rom import patch_rom, patch_race_rom, patch_enemizer, apply_rom_settings, LocalRom, get_hash_string, check_enemizer
 from Doors import create_doors
 from DoorShuffle import link_doors, connect_portal_copy
@@ -105,6 +105,7 @@ def main(args, seed=None, fish=None):
     world.dark_room_logic = args.dark_room_logic.copy()
     world.plando_items = args.plando_items.copy()
     world.plando_texts = args.plando_texts.copy()
+    world.plando_connections = args.plando_connections.copy()
     world.restrict_dungeon_item_on_boss = args.restrict_dungeon_item_on_boss.copy()
     world.potshuffle = args.shufflepots.copy()
     world.keydropshuffle = args.keydropshuffle.copy()
@@ -210,6 +211,7 @@ def main(args, seed=None, fish=None):
             mark_light_world_regions(world, player)
         else:
             mark_dark_world_regions(world, player)
+        plando_connect(world, player)
     logger.info(world.fish.translate("cli","cli","generating.itempool"))
 
     for player in range(1, world.players + 1):
