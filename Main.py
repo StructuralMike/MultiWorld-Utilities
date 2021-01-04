@@ -415,6 +415,7 @@ def main(args, seed=None, fish=None):
 
     pool = concurrent.futures.ThreadPoolExecutor()
     multidata_task = None
+    check_beatability_task = pool.submit(world.can_beat_game)
     if not args.suppress_rom:
         logger.info(world.fish.translate("cli", "cli", "patching.rom"))
         rom_futures = []
@@ -523,7 +524,7 @@ def main(args, seed=None, fish=None):
                                                   "precollected_items": precollected_items,
                                                   "version": _version_tuple,
                                                   "tags": multidatatags,
-                                                  "minimum_versions" : minimum_versions
+                                                  "minimum_versions": minimum_versions
                                                   }).encode("utf-8"), 9)
 
             with open(output_path('%s.multidata' % outfilebase), 'wb') as f:
@@ -542,6 +543,9 @@ def main(args, seed=None, fish=None):
 
         multidata_future = pool.submit(get_enemizer_results)
 
+
+    if not check_beatability_task.result():
+        raise Exception("Game appears unbeatable. Aborting.")
     if not args.skip_playthrough:
         logger.info(world.fish.translate("cli","cli","calc.playthrough"))
         create_playthrough(world)
