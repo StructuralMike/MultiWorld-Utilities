@@ -152,6 +152,10 @@ def main(args, seed=None, fish=None):
         else:
             world.non_local_items[player] = set()
 
+        # enforce pre-defined local items.
+        if world.goal[player] in ["localtriforcehunt", "localganontriforcehunt"]:
+            world.local_items[player].add('Triforce Piece')
+
         # items can't be both local and non-local, prefer local
         world.non_local_items[player] -= world.local_items[player]
 
