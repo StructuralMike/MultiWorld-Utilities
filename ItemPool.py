@@ -277,7 +277,7 @@ def get_custom_array_key(item):
 def toss_junk_item(pool):
     items = ['Rupees (20)', 'Bombs (3)', 'Arrows (10)', 'Rupees (5)', 'Rupee (1)', 'Bombs (10)',
              'Single Arrow', 'Rupees (50)', 'Rupees (100)', 'Single Bomb', 'Bee', 'Bee Trap',
-             'Rupees (300)']
+             'Rupees (300)', 'Nothing']
     for item in items:
         big20 = next((i for i in pool if i == item), None)
         if big20:
@@ -420,7 +420,7 @@ def generate_itempool(world, player: int):
                 toss_junk_item(pool)
         elif amt > 0:
             for _ in range(0, amt):
-                pool.append('Rupees (20)')
+                pool.append('Rupees (20)' if world.goal[player] != 'icerodhunt' else 'Nothing')
 
 
     for item in precollected_items:

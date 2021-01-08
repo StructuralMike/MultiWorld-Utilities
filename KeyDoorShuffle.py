@@ -1717,9 +1717,9 @@ def validate_key_placement(key_layout, world, player):
     big_key_outside = False
     smallkey_name = dungeon_keys[key_layout.sector.name]
     bigkey_name = dungeon_bigs[key_layout.sector.name]
-    if world.keyshuffle[player]:
+    if world.keyshuffle[player] or world.goal[player] == 'icerodhunt':
         keys_outside = key_layout.max_chests - sum(1 for i in max_counter.free_locations if i.item is not None and i.item.name == smallkey_name and i.item.player == player)
-    if world.bigkeyshuffle[player]:
+    if world.bigkeyshuffle[player] or world.goal[player] == 'icerodhunt':
         max_counter = find_max_counter(key_layout)
         big_key_outside = bigkey_name not in (l.item.name for l in max_counter.free_locations if l.item)
 
