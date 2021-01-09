@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '8ca822f47f9fa364a3af6537be5c225b'
+RANDOMIZERBASEHASH = '224e63622d8f4d8e536f6599b30f32a8'
 
 import io
 import itertools
@@ -139,6 +139,9 @@ class LocalRom(object):
                     Patch.create_patch_file(local_path('basepatch.sfc'))
                 return
 
+            if not os.path.isfile(local_path('data', 'basepatch.bmbp')):
+                raise RuntimeError('Base patch unverified.  Unable to continue.')
+
         if os.path.isfile(local_path('data', 'basepatch.bmbp')):
             _, target, buffer = Patch.create_rom_bytes(local_path('data', 'basepatch.bmbp'))
             if self.verify(buffer):
@@ -146,6 +149,7 @@ class LocalRom(object):
                 with open(local_path('basepatch.sfc'), 'wb') as stream:
                     stream.write(buffer)
                 return
+            raise RuntimeError('Base patch unverified.  Unable to continue.')
 
         raise RuntimeError('Could not find Base Patch. Unable to continue.')
 
@@ -685,6 +689,7 @@ def patch_rom(world, rom, player, team, enemized):
         distinguished_prog_bow_loc.item.code = 0x65
 
     # patch items
+
     for location in world.get_locations():
         if location.player != player:
             continue
@@ -692,6 +697,9 @@ def patch_rom(world, rom, player, team, enemized):
         itemid = location.item.code if location.item is not None else 0x5A
 
         if location.address is None:
+            continue
+
+        if 'Shop Slot' in location.name and location.parent_region.shop is not None:
             continue
 
         if not location.crystal:
@@ -731,6 +739,7 @@ def patch_rom(world, rom, player, team, enemized):
                 music = 0x11 if 'Pendant' in location.item.name else 0x16
             for music_address in music_addresses:
                 rom.write_byte(music_address, music)
+
 
     if world.mapshuffle[player]:
         rom.write_byte(0x155C9, local_random.choice([0x11, 0x16]))  # Randomize GT music too with map shuffle
@@ -1740,14 +1749,13 @@ def write_custom_shops(rom, world, player):
         else:
             sram_offset += shop.item_count
         shop_data.extend(bytes)
-        # [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high]
+        # [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high][player]
         for item in shop.inventory:
             if item is None:
                 break
-            item_data = [shop_id, ItemFactory(item['item'], player).code] + int16_as_bytes(item['price']) + [
-                item['max'],
+            item_data = [shop_id, ItemFactory(item['item'], player).code] + int16_as_bytes(item['price']) + [ item['max'],\
                 ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF] + int16_as_bytes(
-                item['replacement_price'])
+                item['replacement_price']) + [item['player']]
             items_data.extend(item_data)
 
     rom.write_bytes(0x184800, shop_data)

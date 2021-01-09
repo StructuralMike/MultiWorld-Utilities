@@ -309,9 +309,13 @@
     "create_diff": ["create a binary patch file from which the randomized rom can be recreated using MultiClient."],
     "shop_shuffle": [
       "combine letters for options:",
+      "g: generate default inventories for light and dark world shops, and unique shops",
+      "f: generate default inventories for each shop individually",
       "i: shuffle the inventories of the shops around",
       "p: randomize the prices of the items in tshop inventories",
-      "u: shuffle capacity upgrades into the item pool"
-    ]
+      "u: shuffle capacity upgrades into the item pool",
+      "w: consider witch's hut like any other shop and shuffle/randomize it too"
+    ],
+    "shop_shuffle_slots": ["Maximum amount of shop slots able to be filled by items from the item pool."]
   }
 }
