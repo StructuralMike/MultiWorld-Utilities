@@ -10,7 +10,7 @@ class FillError(RuntimeError):
     pass
 
 
-def fill_restrictive(world, base_state: CollectionState, locations, itempool, keys_in_itempool = None, single_player_placement=False):
+def fill_restrictive(world, base_state: CollectionState, locations, itempool, keys_in_itempool = None, single_player_placement=False, lock=False):
     def sweep_from_pool():
         new_state = base_state.copy()
         for item in itempool:
@@ -78,6 +78,8 @@ def fill_restrictive(world, base_state: CollectionState, locations, itempool, ke
 
                 world.push_item(spot_to_fill, item_to_place, False)
                 track_outside_keys(item_to_place, spot_to_fill, world)
+                if lock:
+                    spot_to_fill.locked = True
                 locations.remove(spot_to_fill)
                 spot_to_fill.event = True
 
