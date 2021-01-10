@@ -748,8 +748,7 @@ def set_up_shops(world, player: int):
         rss.custom = True
 
     if world.keyshuffle[player] == "universal" or world.retro[player]:
-        for shop in world.random.sample([s for s in world.shops if
-                                         not s.custom and not s.locked and s.type == ShopType.Shop and s.region.player == player],
+        for shop in world.random.sample([s for s in world.shops if not s.locked and s.type == ShopType.Shop and s.region.player == player],
                                         5):
             shop.locked = True
             shop.custom = True
