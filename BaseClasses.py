@@ -1690,7 +1690,7 @@ class DungeonInfo(object):
         # self.dead_ends = 0  total - 1 - req = dead_ends possible
 
 
-class Boss(object):
+class Boss():
     def __init__(self, name, enemizer_name, defeat_rule, player: int):
         self.name = name
         self.enemizer_name = enemizer_name
@@ -1700,7 +1700,12 @@ class Boss(object):
     def can_defeat(self, state) -> bool:
         return self.defeat_rule(state, self.player)
 
-class Location(object):
+
+class Location():
+    shop_slot: bool = False
+    event: bool = False
+    locked: bool = False
+
     def __init__(self, player: int, name: str = '', address=None, crystal: bool = False,
                  hint_text: Optional[str] = None, parent=None,
                  forced_item=None, player_address=None):
@@ -1723,7 +1728,6 @@ class Location(object):
         self.spot_type = 'Location'
         self.hint_text: str = hint_text if hint_text else name
         self.recursion_count = 0
-        self.locked = False
         self.always_allow = lambda item, state: False
         self.access_rule = lambda state: True
         self.item_rule = lambda item: True
@@ -1889,7 +1893,8 @@ class Shop():
         self.inventory = [None] * self.slots
 
     def add_inventory(self, slot: int, item: str, price: int, max: int = 0,
-                      replacement: Optional[str] = None, replacement_price: int = 0, create_location: bool = False):
+                      replacement: Optional[str] = None, replacement_price: int = 0, create_location: bool = False,
+                      player: int = 0):
         self.inventory[slot] = {
             'item': item,
             'price': price,
@@ -1897,10 +1902,10 @@ class Shop():
             'replacement': replacement,
             'replacement_price': replacement_price,
             'create_location': create_location,
-            'player': 0
+            'player': player
         }
 
-    def push_inventory(self, slot: int, item: str, price: int, max: int = 1):
+    def push_inventory(self, slot: int, item: str, price: int, max: int = 1, player: int = 0):
         if not self.inventory[slot]:
             raise ValueError("Inventory can't be pushed back if it doesn't exist")
 
@@ -1911,9 +1916,11 @@ class Shop():
             'replacement': self.inventory[slot]["item"],
             'replacement_price': self.inventory[slot]["price"],
             'create_location': self.inventory[slot]["create_location"],
-            'player': self.inventory[slot]["player"]
+            'player': player
         }
 
+    def can_push_inventory(self, slot: int):
+        return self.inventory[slot] and not self.inventory[slot]["replacement"]
 
 class TakeAny(Shop):
     type = ShopType.TakeAny
