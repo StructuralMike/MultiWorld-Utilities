@@ -328,6 +328,11 @@ def main(args, seed=None, fish=None):
     if not world.can_beat_game():
         raise RuntimeError(world.fish.translate("cli","cli","cannot.beat.game"))
 
+    # remove locations that may no longer exist from caches, by flushing them entirely
+    if shop_slots:
+        world.clear_location_cache()
+        world._location_cache = {}
+
     outfilebase = 'BD_%s' % (args.outputname if args.outputname else world.seed)
 
     rom_names = []
