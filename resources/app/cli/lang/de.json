@@ -13,7 +13,7 @@
     "done": "Fertig. Viel Spaß.",
     "total.time": "Gesamtzeit: %s",
     "building.collection.spheres": "Baue Sammelbereiche auf.",
-    "building.calculating.spheres": "Berechneter Bereich %i, beinhaltet %i von %i Progressionsgegenständen.",
+    "building.calculating.spheres": "Berechneter Bereich %i, beinhaltet %i von %i Progressionsgegenständen. (%i)",
     "cannot.reach.items": "Die folgenden Gegenstände können nicht erreicht werden: %s",
     "cannot.reach.item": "%s (Spieler %d) in %s (Spieler %d)",
     "check.item.location": "Prüfe ob %s (Spieler %d) benötigt wird um das Spiel zu schlagen.",

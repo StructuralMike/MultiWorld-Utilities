@@ -51,7 +51,7 @@
     "enemizer.not.found": "Enemizer not found at",
     "enemizer.nothing.applied": "No Enemizer options will be applied until this is resolved.",
     "building.collection.spheres": "Building up collection spheres",
-    "building.calculating.spheres": "Calculated sphere %i, containing %i of %i progress items.",
+    "building.calculating.spheres": "Calculated sphere %i, containing %i of %i progress items. (Total Collected: %i)",
     "building.final.spheres": "Calculated final sphere %i, containing %i of %i progress items."
   },
   "help": {
