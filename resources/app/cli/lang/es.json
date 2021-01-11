@@ -28,7 +28,7 @@
     "enemizer.not.found": "Enemizer no encontrado en",
 
     "building.collection.spheres": "Construyendo esferas de recolección.",
-    "building.calculating.spheres": "Esfera calculada %i, que contiene %i de %i elementos de progreso.",
+    "building.calculating.spheres": "Esfera calculada %i, que contiene %i de %i elementos de progreso. (%i)",
     "building.final.spheres": "Esfera final calculada %i, que contiene %i de %i elementos de progreso."
   }
 }
