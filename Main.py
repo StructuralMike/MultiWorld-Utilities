@@ -319,6 +319,8 @@ def main(args, seed=None, fish=None):
 
             shop.push_inventory(slot_num, item_name, price, 1,
                                 location.item.player if location.item.player != location.player else 0)
+        else:
+            shop.region.locations.remove(location)
 
     # if we only check for beatable, we can do this sanity check first before creating the rom
     if not world.can_beat_game():
