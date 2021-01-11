@@ -49,8 +49,9 @@ def set_rules(world, player):
         # require all dungeons to beat ganon
         add_rule(ganon, lambda state: state.can_reach('Master Sword Pedestal', 'Location', player) and state.has('Beat Agahnim 1', player) and state.has('Beat Agahnim 2', player) and state.has_crystals(7, player))
     elif world.goal[player] == 'ganon':
-        # require aga2 to beat ganon
-        add_rule(ganon, lambda state: state.has('Beat Agahnim 2', player))
+        # require aga2 to beat ganon, as well crystals
+        add_rule(ganon, lambda state: state.has('Beat Agahnim 2', player) and
+                                      state.has_crystals(world.crystals_needed_for_ganon[player], player))
     elif world.goal[player] in ['ganontriforcehunt', 'localganontriforcehunt']:
         add_rule(ganon, lambda state: state.has_triforce_pieces(world.treasure_hunt_count[player], player))
     elif world.goal[player] == 'ganonpedestal':
