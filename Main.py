@@ -806,7 +806,7 @@ def create_playthrough(world):
 
         state_cache.append(state.copy())
 
-        logging.debug(world.fish.translate("cli","cli","building.calculating.spheres"), len(collection_spheres), len(sphere), len(prog_locations))
+        logging.debug(world.fish.translate("cli","cli","building.calculating.spheres"), len(collection_spheres), len(sphere), len(prog_locations), sum(len(collection_sphere) for collection_sphere in collection_spheres))
         if not sphere:
             logging.error(world.fish.translate("cli","cli","cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
             if any([world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
