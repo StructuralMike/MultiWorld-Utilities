@@ -292,6 +292,13 @@ def main(args, seed=None, fish=None):
 
         world.random.shuffle(candidates)
 
+        if not world.fulfills_accessibility():
+            logger.warning("World does not fulfill accessibility rules as is, "
+                           "only using \"beatable only\" for shop logic.")
+            shuffle_condition = world.can_beat_game
+        else:
+            shuffle_condition = world.fulfills_accessibility
+
         # currently special care needs to be taken so that Shop.region.locations.item is identical to Shop.inventory
         # Potentially create Locations as needed and make inventory the only source, to prevent divergence
 
@@ -304,7 +311,7 @@ def main(args, seed=None, fish=None):
 
                         swap_location_item(c, location, check_locked=False)
                         candidates.remove(c)
-                        if not world.fulfills_accessibility():
+                        if not shuffle_condition():
                             swap_location_item(c, location, check_locked=False)
                             continue
 
