@@ -18,8 +18,9 @@ import xxtea
 import concurrent.futures
 from typing import Optional
 
-from BaseClasses import CollectionState, ShopType, Region, Location, Door, DoorType, RegionType, PotItem
+from BaseClasses import CollectionState, Region, Location, Door, DoorType, RegionType, PotItem
 from DoorShuffle import compass_data, DROptions, boss_indicator
+from Shops import ShopType
 from Dungeons import dungeon_music_addresses
 from KeyDoorShuffle import count_locations_exclude_logic
 from Regions import location_table, old_location_address_to_new_location_address
