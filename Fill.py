@@ -300,6 +300,11 @@ def balance_multiworld_progression(world):
 
         reachable_locations_count = {player: 0 for player in range(1, world.players + 1)}
 
+        def event_key(location):
+            return location.event and (
+                    world.keyshuffle[location.item.player] or not location.item.smallkey) and (
+                    world.bigkeyshuffle[location.item.player] or not location.item.bigkey)
+
         def get_sphere_locations(sphere_state, locations):
             sphere_state.sweep_for_events(key_only=True, locations=locations)
             return [loc for loc in locations if sphere_state.can_reach(loc) and sphere_state.not_flooding_a_key(sphere_state.world, loc)]
@@ -322,7 +327,7 @@ def balance_multiworld_progression(world):
                     candidate_items = []
                     while True:
                         for location in balancing_sphere:
-                            if location.event and (world.keyshuffle[location.item.player] or not location.item.smallkey) and (world.bigkeyshuffle[location.item.player] or not location.item.bigkey):
+                            if event_key(location):
                                 balancing_state.collect(location.item, True, location)
                                 if location.item.player in balancing_players and not location.locked:
                                     candidate_items.append(location)
@@ -382,8 +387,7 @@ def balance_multiworld_progression(world):
                             sphere_locations.append(location)
 
             for location in sphere_locations:
-                if location.event and (world.keyshuffle[location.item.player] or not location.item.smallkey) and (
-                        world.bigkeyshuffle[location.item.player] or not location.item.bigkey):
+                if event_key(location):
                     state.collect(location.item, True, location)
             checked_locations.extend(sphere_locations)
 
