@@ -1152,7 +1152,7 @@ async def track_locations(ctx : Context, roomid, roomdata):
 
     def new_check(location):
         ctx.locations_checked.add(location)
-        ctx.ui_node.log_info("New check: %s (%d/216)" % (location, len(ctx.locations_checked)))
+        logger.info("New check: %s (%d/216)" % (location, len(ctx.locations_checked)))
         ctx.ui_node.send_location_check(ctx, location)
     
     try: 
@@ -1164,8 +1164,8 @@ async def track_locations(ctx : Context, roomid, roomdata):
                     new_check(my_check)
     except Exception as e:
         print(e)
-        ctx.ui_node.log_info(f"Exception: {e}")
-                
+        logger.info(f"Exception: {e}")
+
 
     for location, (loc_roomid, loc_mask) in location_table_uw.items():
         try:
@@ -1228,7 +1228,7 @@ async def track_locations(ctx : Context, roomid, roomdata):
             new_locations.append(my_id)
         except Exception as e:
             print(e)
-            ctx.ui_node.log_info(f"Exception: {e}")
+            logger.info(f"Exception: {e}")
 
 
     await ctx.send_msgs([['LocationChecks', new_locations]])
