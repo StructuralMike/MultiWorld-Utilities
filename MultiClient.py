@@ -14,6 +14,7 @@ import typing
 import os
 import subprocess
 import re
+import shutil
 
 from random import randrange
 
@@ -1437,7 +1438,7 @@ async def main():
         adjustedromfile, adjusted = Utils.get_adjuster_settings(romfile)
         if adjusted:
             try:
-                os.replace(adjustedromfile, romfile)
+                shutil.move(adjustedromfile, romfile)
                 adjustedromfile = romfile
             except Exception as e:
                 logging.exception(e)
