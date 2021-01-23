@@ -10,7 +10,7 @@ import zlib
 import concurrent.futures
 
 from BaseClasses import World, CollectionState, Item, Region, Location, Entrance
-from Shops import ShopSlotFill, create_shops, SHOP_ID_START
+from Shops import ShopSlotFill, create_shops, SHOP_ID_START, FillDisabledShopSlots
 from Items import ItemFactory, item_table, item_name_groups
 from KeyDoorShuffle import validate_key_placement
 from PotShuffle import shuffle_pots
@@ -479,6 +479,8 @@ def main(args, seed=None, fish=None):
         precollected_items = [[] for player in range(world.players)]
         for item in world.precollected_items:
             precollected_items[item.player - 1].append(item.code)
+
+        FillDisabledShopSlots(world)
 
         def write_multidata(roms):
             enemized = False
