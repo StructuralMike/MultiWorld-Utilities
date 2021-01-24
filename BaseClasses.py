@@ -1798,6 +1798,7 @@ class Location():
           self.item.location = self
           self.item.world = parent.world if parent and parent.world else None
           self.event = True
+          self.locked = True
         else:
           self.forced_item = None
           self.item = None

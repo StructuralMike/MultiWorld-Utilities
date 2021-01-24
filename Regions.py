@@ -871,6 +871,7 @@ def adjust_locations(world, player):
             loc.forced_item = None
             loc.item = None
             loc.event = False
+            loc.locked = False
             loc.address = key_drop_data[location][1]
             loc.player_address = key_drop_data[location][0]
 
