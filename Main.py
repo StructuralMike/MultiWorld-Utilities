@@ -229,13 +229,13 @@ def main(args, seed=None, fish=None):
     for player in range(1, world.players + 1):
         set_rules(world, player)
 
-    logger.info(world.fish.translate("cli","cli","placing.dungeon.prizes"))
-
-    fill_prizes(world)
-
     logger.info("Running Item Plando")
 
     distribute_planned(world)
+
+    logger.info(world.fish.translate("cli","cli","placing.dungeon.prizes"))
+
+    fill_prizes(world)
 
     logger.info(world.fish.translate("cli","cli","placing.dungeon.items"))
 
