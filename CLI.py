@@ -117,7 +117,8 @@ def parse_cli(argv, no_defaults=False):
                          'remote_items', 'timer', 'progressive', "glitch_boots", 'killable_thieves', 'shuffle_prizes',
                          'tile_shuffle', 'bush_shuffle', 'shop_shuffle', 'sprite_pool', 'dark_room_logic', 'restrict_dungeon_item_on_boss',
                          'hud_palettes', 'sword_palettes', 'shield_palettes', 'link_palettes', 'keydropshuffle', 'mixed_travel',
-                         'standardize_palettes', 'plando_items', 'plando_texts', 'plando_connections', 'required_medallions']:
+                         'standardize_palettes', 'plando_items', 'plando_texts', 'plando_connections', 'required_medallions',
+                         "shop_shuffle_slots"]:
                 value = getattr(defaults, name) if getattr(playerargs, name) is None else getattr(playerargs, name)
                 if player == 1:
                     setattr(ret, name, {1: value})

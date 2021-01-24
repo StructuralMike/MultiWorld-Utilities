@@ -135,7 +135,7 @@ def fill_dungeons_restrictive(world):
         sort_order = {"BigKey": 3, "SmallKey": 2}
         dungeon_items.sort(key=lambda item: sort_order.get(item.type, 1))
         fill_restrictive(world, all_state_base, locations, dungeon_items, 
-                         keys_in_itempool={player: not world.keyshuffle[player] for player in range(1, world.players+1)}, single_player_placement=True)
+                         keys_in_itempool={player: not world.keyshuffle[player] for player in range(1, world.players+1)}, single_player_placement=True, lock=True)
 
 
 dungeon_music_addresses = {'Eastern Palace - Prize': [0x1559A],

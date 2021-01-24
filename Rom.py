@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '8ca822f47f9fa364a3af6537be5c225b'
+RANDOMIZERBASEHASH = 'd13e0cdf52fc2449bd2395f213197d6a'
 
 import io
 import itertools
@@ -18,8 +18,9 @@ import xxtea
 import concurrent.futures
 from typing import Optional
 
-from BaseClasses import CollectionState, ShopType, Region, Location, Door, DoorType, RegionType, PotItem
+from BaseClasses import CollectionState, Region, Location, Door, DoorType, RegionType, PotItem
 from DoorShuffle import compass_data, DROptions, boss_indicator
+from Shops import ShopType
 from Dungeons import dungeon_music_addresses
 from KeyDoorShuffle import count_locations_exclude_logic
 from Regions import location_table, old_location_address_to_new_location_address
@@ -139,6 +140,9 @@ class LocalRom(object):
                     Patch.create_patch_file(local_path('basepatch.sfc'))
                 return
 
+            if not os.path.isfile(local_path('data', 'basepatch.bmbp')):
+                raise RuntimeError('Base patch unverified.  Unable to continue.')
+
         if os.path.isfile(local_path('data', 'basepatch.bmbp')):
             _, target, buffer = Patch.create_rom_bytes(local_path('data', 'basepatch.bmbp'))
             if self.verify(buffer):
@@ -146,6 +150,7 @@ class LocalRom(object):
                 with open(local_path('basepatch.sfc'), 'wb') as stream:
                     stream.write(buffer)
                 return
+            raise RuntimeError('Base patch unverified.  Unable to continue.')
 
         raise RuntimeError('Could not find Base Patch. Unable to continue.')
 
@@ -685,14 +690,12 @@ def patch_rom(world, rom, player, team, enemized):
         distinguished_prog_bow_loc.item.code = 0x65
 
     # patch items
+
     for location in world.get_locations():
-        if location.player != player:
+        if location.player != player or location.address is None or location.shop_slot:
             continue
 
         itemid = location.item.code if location.item is not None else 0x5A
-
-        if location.address is None:
-            continue
 
         if not location.crystal:
             if location.item is not None:
@@ -731,6 +734,7 @@ def patch_rom(world, rom, player, team, enemized):
                 music = 0x11 if 'Pendant' in location.item.name else 0x16
             for music_address in music_addresses:
                 rom.write_byte(music_address, music)
+
 
     if world.mapshuffle[player]:
         rom.write_byte(0x155C9, local_random.choice([0x11, 0x16]))  # Randomize GT music too with map shuffle
@@ -931,6 +935,10 @@ def patch_rom(world, rom, player, team, enemized):
         # bottom half
         rom.write_byte(0x118B87, mid_bot)
         rom.write_byte(0x118B88, last_bot)
+        if total < 10:
+            rom.write_byte(0x11B615, 0xC1)
+            rom.write_byte(0x118B69, 0xA2)
+            rom.write_byte(0x118B87, 0xC2)
 
     # patch medallion requirements
     if world.required_medallions[player][0] == 'Bombos':
@@ -1723,31 +1731,26 @@ def patch_race_rom(rom, world, player):
 
 
 def write_custom_shops(rom, world, player):
-    shops = [shop for shop in world.shops if shop.custom and shop.region.player == player]
+    shops = sorted([shop for shop in world.shops if shop.custom and shop.region.player == player],
+                   key=lambda shop: shop.sram_offset)
 
     shop_data = bytearray()
     items_data = bytearray()
-    sram_offset = 0
 
     for shop_id, shop in enumerate(shops):
         if shop_id == len(shops) - 1:
             shop_id = 0xFF
         bytes = shop.get_bytes()
         bytes[0] = shop_id
-        bytes[-1] = sram_offset
-        if shop.type == ShopType.TakeAny:
-            sram_offset += 1
-        else:
-            sram_offset += shop.item_count
+        bytes[-1] = shop.sram_offset
         shop_data.extend(bytes)
-        # [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high]
+        # [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high][player]
         for item in shop.inventory:
             if item is None:
                 break
-            item_data = [shop_id, ItemFactory(item['item'], player).code] + int16_as_bytes(item['price']) + [
-                item['max'],
-                ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF] + int16_as_bytes(
-                item['replacement_price'])
+            item_data = [shop_id, ItemFactory(item['item'], player).code] + int16_as_bytes(item['price']) + \
+                        [item['max'], ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF] + \
+                        int16_as_bytes(item['replacement_price']) + [0 if item['player'] == player else item['player']]
             items_data.extend(item_data)
 
     rom.write_bytes(0x184800, shop_data)
