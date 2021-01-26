@@ -183,8 +183,8 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
     fill_restrictive(world, world.state, fill_locations, progitempool,
                      keys_in_itempool={player: world.keyshuffle[player] for player in range(1, world.players + 1)})
 
-    if any(localprioitempool.values() or
-           localrestitempool.values()):  # we need to make sure some fills are limited to certain worlds
+    if any(localprioitempool.values()) or \
+            any(localrestitempool.values()):  # we need to make sure some fills are limited to certain worlds
         local_locations = {player: [] for player in world.player_ids}
         for location in fill_locations:
             local_locations[location.player].append(location)
