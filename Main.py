@@ -312,7 +312,7 @@ def main(args, seed=None, fish=None):
                 logging.warning(enemizerMsg)
                 raise EnemizerError(enemizerMsg)
             else:
-                patch_enemizer(world, player, rom, args.enemizercli)
+                patch_enemizer(world, team, player, rom, args.enemizercli)
                 enemized = True
 
         if args.race:
