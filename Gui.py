@@ -99,15 +99,24 @@ def guiMain(args=None):
 
     tileShuffleVar = IntVar()
     tileShuffleButton = Checkbutton(checkBoxFrame, text="Tile shuffle", variable=tileShuffleVar)
+    
     balancingVar = IntVar()
     balancingVar.set(1)  # set default
     balancingCheckbutton = Checkbutton(checkBoxFrame, text="Multiworld Progression Balancing", variable=balancingVar)
+    
+    keydropshuffleVar = IntVar()
+    keydropshuffleVar.set(0)
+    keydropshuffleCheckbutton = Checkbutton(checkBoxFrame, text="Key Drop Shuffle", variable=keydropshuffleVar)
+
+    
     doorexperimentalVar = IntVar()
     doorexperimentalVar.set(0)
+    doorexperimentalCheckbutton = Checkbutton(checkBoxFrame, text="Experimental Door Features", variable=doorexperimentalVar)
+    
     doordebugVar = IntVar()
     doordebugVar.set(0)
-    doorexperimentalCheckbutton = Checkbutton(checkBoxFrame, text="Experimental Door Features", variable=doorexperimentalVar)
     doordebugCheckbutton = Checkbutton(checkBoxFrame, text="Door Debug Mode", variable=doordebugVar)
+    
     patchesVar = IntVar()
     patchesVar.set(1)  # set default
     patchesCheckbutton = Checkbutton(checkBoxFrame, text="Create Delta Patches", variable=patchesVar)
@@ -128,7 +137,9 @@ def guiMain(args=None):
 
     tileShuffleButton.pack(expand=True, anchor=W)
     balancingCheckbutton.pack(expand=True, anchor=W)
-    doorexperimentalCheckbutton.pack(expand=True, anchor=W)
+    # putting experimental stuff on the gui might be a bad idea
+    # doorexperimentalCheckbutton.pack(expand=True, anchor=W)
+    keydropshuffleCheckbutton.pack(expand=True, anchor=W)
     doordebugCheckbutton.pack(expand=True, anchor=W)
     patchesCheckbutton.pack(expand=True, anchor=W)
 
@@ -408,7 +419,6 @@ def guiMain(args=None):
     prizeLabel = Label(prizeFrame, text='Shuffle Prizes/Drops')
     prizeLabel.pack(side=LEFT)
 
-
     doorshuffleFrame = Frame(drowDownFrame)
     doorshuffleVar = StringVar()
     doorshuffleVar.set('vanilla')
@@ -582,6 +592,7 @@ def guiMain(args=None):
         guiargs.green_clock_time = timerGreenVar.get()
         guiargs.skip_progression_balancing = not balancingVar.get()
         guiargs.experimental = doorexperimentalVar.get()
+        guiargs.keydropshuffle = keydropshuffleVar.get()
         guiargs.debug = doordebugVar.get()
         if guiargs.timer == "none":
             guiargs.timer = False
