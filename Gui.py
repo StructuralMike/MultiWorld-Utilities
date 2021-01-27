@@ -1949,5 +1949,5 @@ if __name__ == '__main__':
             top.update()
         print("Done updating sprites")
     else:
-        logging.basicConfig(format='%(message)s', level=logging.INFO)
+        logging.basicConfig(level=logging.INFO)
         guiMain()
