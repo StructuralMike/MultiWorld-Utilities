@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'd13e0cdf52fc2449bd2395f213197d6a'
+RANDOMIZERBASEHASH = '4efe1b0eb2255e010cc1d248541df889'
 
 import io
 import itertools
@@ -1741,6 +1741,7 @@ def write_custom_shops(rom, world, player):
 
     shop_data = bytearray()
     items_data = bytearray()
+    retro_shop_slots = bytearray()
 
     for shop_id, shop in enumerate(shops):
         if shop_id == len(shops) - 1:
@@ -1749,10 +1750,27 @@ def write_custom_shops(rom, world, player):
         bytes[0] = shop_id
         bytes[-1] = shop.sram_offset
         shop_data.extend(bytes)
-        # [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high][player]
-        for item in shop.inventory:
+
+        arrow_mask = 0x00
+        for index, item in enumerate(shop.inventory):
+            slot = 0 if shop.type == ShopType.TakeAny else index
             if item is None:
                 break
+            if world.shop_shuffle_slots[player]:
+                count_shop = (shop.region.name != 'Potion Shop' or 'w' in world.shop_shuffle[player]) and \
+                             shop.region.name != 'Capacity Upgrade'
+                rom.write_byte(0x186560 + shop.sram_offset + slot, 1 if count_shop else 0)
+            if item['item'] == 'Single Arrow' and item['player'] == 0:
+                arrow_mask |= 1 << index
+                retro_shop_slots.append(shop.sram_offset + slot)
+
+        # [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high][player]
+        for index, item in enumerate(shop.inventory):
+            slot = 0 if shop.type == ShopType.TakeAny else index
+            if item is None:
+                break
+            if item['item'] == 'Single Arrow' and item['player'] == 0 and world.retro[player]:
+                rom.write_byte(0x186500 + shop.sram_offset + slot, arrow_mask)
             item_data = [shop_id, ItemFactory(item['item'], player).code] + int16_as_bytes(item['price']) + \
                         [item['max'], ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF] + \
                         int16_as_bytes(item['replacement_price']) + [0 if item['player'] == player else item['player']]
@@ -1762,6 +1780,10 @@ def write_custom_shops(rom, world, player):
 
     items_data.extend([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])
     rom.write_bytes(0x184900, items_data)
+
+    if world.retro[player]:
+        retro_shop_slots.append(0xFF)
+        rom.write_bytes(0x186540, retro_shop_slots)
 
 
 def hud_format_text(text):
