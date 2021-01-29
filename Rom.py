@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '4efe1b0eb2255e010cc1d248541df889'
+RANDOMIZERBASEHASH = 'c272651712f627c1f841de70eabf1b3b'
 
 import io
 import itertools
@@ -20,7 +20,7 @@ from typing import Optional
 
 from BaseClasses import CollectionState, Region, Location, Door, DoorType, RegionType, PotItem
 from DoorShuffle import compass_data, DROptions, boss_indicator
-from Shops import ShopType
+from Shops import ShopType, total_shop_slots
 from Dungeons import dungeon_music_addresses
 from KeyDoorShuffle import count_locations_exclude_logic
 from Regions import location_table, old_location_address_to_new_location_address
@@ -1764,7 +1764,7 @@ def write_custom_shops(rom, world, player):
             slot = 0 if shop.type == ShopType.TakeAny else index
             if item is None:
                 break
-            if world.shop_shuffle_slots[player]:
+            if world.shop_shuffle_slots[player] or shop.type == ShopType.TakeAny:
                 count_shop = (shop.region.name != 'Potion Shop' or 'w' in world.shop_shuffle[player]) and \
                              shop.region.name != 'Capacity Upgrade'
                 rom.write_byte(0x186560 + shop.sram_offset + slot, 1 if count_shop else 0)
