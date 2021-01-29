@@ -911,19 +911,6 @@ def patch_rom(world, rom, player, team, enemized):
         # bot: $7A is 1, 7B is 2, etc so 7D=4, 82=9 (zero unknown...)
         return 0x53+num, 0x79+num
 
-    if world.keydropshuffle[player]:
-        rom.write_byte(0x140000, 1)
-        rom.write_byte(0x187010, 249)  # dynamic credits
-        # collection rate address: 238C37
-        mid_top, mid_bot = credits_digit(4)
-        last_top, last_bot = credits_digit(9)
-        # top half
-        rom.write_byte(0x118C47, mid_top)
-        rom.write_byte(0x118C48, last_top)
-        # bottom half
-        rom.write_byte(0x118C65, mid_bot)
-        rom.write_byte(0x118C66, last_bot)
-
     if world.keydropshuffle[player] or world.doorShuffle[player] != 'vanilla':
         gt = world.dungeon_layouts[player]['Ganons Tower']
         gt_logic = world.key_logic[player]['Ganons Tower']
@@ -944,6 +931,27 @@ def patch_rom(world, rom, player, team, enemized):
             rom.write_byte(0x11B615, 0xC1)
             rom.write_byte(0x118B69, 0xA2)
             rom.write_byte(0x118B87, 0xC2)
+
+    credits_total = 216
+    if world.goal[player] == 'icerodhunt':  # Impossible to get 216/216 with Ice rod hunt. Most possible is 215/216.
+        credits_total -= 1
+    if world.retro[player]:  # Old man cave and Take any caves will count towards collection rate.
+        credits_total += 5
+    if world.shop_shuffle_slots[player]:  # Potion shop only counts towards collection rate if included in the shuffle.
+        credits_total += 30 if 'w' in world.shop_shuffle[player] else 27
+    if world.keydropshuffle[player]:
+        credits_total += 33
+        rom.write_byte(0x140000, 1)
+
+    rom.write_bytes(0x187010, int16_as_bytes(credits_total))  # dynamic credits
+    # collection rate address: 238C37
+    first_top, first_bot = credits_digit((credits_total // 100) % 10)
+    mid_top, mid_bot = credits_digit((credits_total // 10) % 10)
+    last_top, last_bot = credits_digit(credits_total % 10)
+    # top half
+    rom.write_bytes(0x118C46, [first_top, mid_top, last_top])
+    # bottom half
+    rom.write_bytes(0x118C64, [first_bot, mid_bot, last_bot])
 
     # patch medallion requirements
     if world.required_medallions[player][0] == 'Bombos':
