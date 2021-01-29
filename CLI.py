@@ -151,7 +151,7 @@ def parse_settings():
         "skip_progression_balancing": False,
 
         # Shuffle Ganon defaults to TRUE
-        "open_pyramid": False,
+        "open_pyramid": "auto",
         "shuffleganon": True,
         "shuffle": "vanilla",
 

@@ -235,7 +235,16 @@
       "Random: Picks a random value between 0 and 7 (inclusive).",
       "0-7:    Number of crystals needed"
     ],
-    "open_pyramid": [ "Pre-opens the pyramid hole, this removes the Agahnim 2 requirement for it. (default: %(default)s)" ],
+    "open_pyramid": [
+      "Pre-opens the pyramid hole, this removes the Agahnim 2 requirement for it. (default: %(default)s)",
+      "Depending on goal, you might still need to beat Agahnim 2 in order to beat ganon.",
+      "fast ganon goals are crystals, ganontriforcehunt, localganontriforcehunt, pedestalganon",
+      "auto - Only opens pyramid hole if the goal specifies a fast ganon, and entrance shuffle",
+      "       is vanilla, dungeonssimple or dungeonsfull.",
+      "goal - Opens pyramid hole if the goal specifies a fast ganon.",
+      "yes - Always opens the pyramid hole.",
+      "no - Never opens the pyramid hole."
+    ],
     "rom": [
       "Path to an ALttP JP (1.0) rom to use as a base." ,
       "(default: %(default)s)"

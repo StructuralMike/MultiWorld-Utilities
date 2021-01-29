@@ -137,6 +137,14 @@ def main(args, seed=None, fish=None):
     for player in range(1, world.players + 1):
         world.difficulty_requirements[player] = difficulties[world.difficulty[player]]
 
+        if world.open_pyramid[player] == 'goal':
+            world.open_pyramid[player] = world.goal[player] in {'crystals', 'ganontriforcehunt', 'localganontriforcehunt', 'ganonpedestal'}
+        elif world.open_pyramid[player] == 'auto':
+            world.open_pyramid[player] = world.goal[player] in {'crystals', 'ganontriforcehunt', 'localganontriforcehunt', 'ganonpedestal'} and \
+                                         (world.shuffle[player] in {'vanilla', 'dungeonssimple', 'dungeonsfull'} or not world.shuffle_ganon)
+        else:
+            world.open_pyramid[player] = {'on': True, 'off': False, 'yes': True, 'no': False}.get(world.open_pyramid[player], world.open_pyramid[player])
+
         for tok in filter(None, args.startinventory[player].split(',')):
             item = ItemFactory(tok.strip(), player)
             if item:
