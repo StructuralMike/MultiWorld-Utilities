@@ -122,8 +122,6 @@ def fill_dungeons_restrictive(world):
     for item in world.get_items():
         if (item.smallkey and world.keyshuffle[item.player]) or (item.bigkey and world.bigkeyshuffle[item.player]):
             item.advancement = True
-        elif (item.map and world.mapshuffle[item.player]) or (item.compass and world.compassshuffle[item.player]):
-            item.priority = True
 
     dungeon_items = [item for item in get_dungeon_item_pool(world) if (((item.smallkey and not world.keyshuffle[item.player])
                                                                        or (item.bigkey and not world.bigkeyshuffle[item.player])

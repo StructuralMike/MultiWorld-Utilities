@@ -678,7 +678,7 @@ def copy_world(world):
     for location in world.get_locations():
         new_location = ret.get_location(location.name, location.player)
         if location.item is not None:
-            item = Item(location.item.name, location.item.advancement, location.item.priority, location.item.type, player = location.item.player)
+            item = Item(location.item.name, location.item.advancement, location.item.type, player = location.item.player)
             new_location.item = item
             item.location = new_location
             item.world = ret
@@ -692,7 +692,7 @@ def copy_world(world):
 
     # copy remaining itempool. No item in itempool should have an assigned location
     for item in world.itempool:
-        ret.itempool.append(Item(item.name, item.advancement, item.priority, item.type, player = item.player))
+        ret.itempool.append(Item(item.name, item.advancement, item.type, player = item.player))
 
     for item in world.precollected_items:
         ret.push_precollected(ItemFactory(item.name, item.player))
