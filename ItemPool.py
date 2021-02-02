@@ -395,7 +395,7 @@ def generate_itempool(world, player: int):
         if item.advancement or item.type:
             progressionitems.append(item)
         elif world.beemizer[player] and item.name in trap_replaceable:
-            if world.random.random() < world.beemizer[item.player] * 0.25:
+            if world.random.random() < world.beemizer[item.player] * 0.15:
                 if world.random.random() < (0.5 + world.beemizer[item.player] * 0.1):
                     nonprogressionitems.append(ItemFactory("Bee Trap", player))
                 else:

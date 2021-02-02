@@ -1645,7 +1645,7 @@ def hud_format_text(text):
 
 
 def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite: str, palettes_options,
-                       world=None, player=1, allow_random_on_event=False):
+                       world=None, player=1, allow_random_on_event=False, reduceflashing=False, cutscenespeed="normal"):
     local_random = random if not world else world.rom_seeds[player]
 
     # enable instant item menu
@@ -1669,6 +1669,85 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
         rom.write_byte(0x180048, 0x04)
     else:
         rom.write_byte(0x180048, 0x08)
+
+
+    # Reduce flashing by nopping out instructions
+    if reduceflashing:
+        rom.write_bytes(0xEE651, [0xEA]*3) # nop out any flash triggers (storing to 0x0FF9)
+        rom.write_bytes(0xED315, [0xEA]*3) # includes aga lightning, mad batter (untested), vitreous (untested)
+        rom.write_bytes(0x2FBE0, [0xEA]*3) 
+        rom.write_bytes(0x67535, [0xEA]*3) 
+
+        rom.write_bytes(0x42ACB, [0xEA]*3) # nop out ether palette trigger ; lda 0 always beqs
+        rom.write_bytes(0x123FE, [0x72]) # set lightning flash in misery mire (and standard?) to brightness 0x72
+        rom.write_byte(0x30817F, 0x01) # rom accessibility option
+    else:
+        rom.write_bytes(0xEE651, [0x8D, 0xF9, 0x0F])  
+        rom.write_bytes(0xED315, [0x8D, 0xF9, 0x0F])  
+        rom.write_bytes(0x2FBE0, [0x8D, 0xF9, 0x0F]) 
+        rom.write_bytes(0x67535, [0x8E, 0xF9, 0x0F]) 
+
+        rom.write_bytes(0x42ACB, [0xBD, 0x54, 0x0C]) 
+        rom.write_bytes(0x123FE, [0x32])
+        rom.write_byte(0x30817F, 0x00)
+
+    # Wall and Watergate cutscenes
+    if cutscenespeed == "fast":
+        rom.write_byte(0xCA66 + 2, 0x44) # faster wall cutscene (0x22 normal, 0x44 faster(?), 0xFF fastest)
+        rom.write_byte(0xF323 + 1, 0x02) # faster water pull cutscene (setting adc to 2, any faster still waits for water gate animation, so needs the tweak below)
+        rom.write_byte(0x9C07, 0x0F) # water gate starting frame
+        rom.write_byte(0x45294, 0x03) # bird cutscene spin
+        rom.write_bytes(0x48d2a, [0xA9, 0x40, 0x01]) # bird cutscene delay 
+    elif cutscenespeed == "blazing":
+        rom.write_byte(0xCA66 + 2, 0xFF) 
+        rom.write_byte(0xF323 + 1, 0x04) # faster water pull cutscene (setting adc to 4)
+        rom.write_byte(0x9C07, 0x28) # water gate starting frame
+        rom.write_byte(0x45294, 0x03)
+        rom.write_bytes(0x48d2a, [0xA9, 0x80, 0x00])
+    elif cutscenespeed == "slow":
+        rom.write_byte(0xCA66 + 2, 0x07) # slower wall cutscene (0x7 slow, 0x22 normal, 0x44 faster(?), 0xFF fastest)
+        rom.write_byte(0xF323 + 1, 0x01) # default water pull cutscene
+        rom.write_byte(0x9C07, 0x0F) # default water gate starting frame
+        rom.write_byte(0x45294, 0x07) # default
+        rom.write_bytes(0x48d2a, [0xA9, 0x80, 0x02]) # default
+    else:
+        rom.write_byte(0xCA66 + 2, 0x22) 
+        rom.write_byte(0xF323 + 1, 0x01) # faster water pull cutscene (setting adc to 4)
+        rom.write_byte(0x9C07, 0x0F) # water gate starting frame
+        rom.write_byte(0x45294, 0x07)
+        # rom.write_bytes(0x330E8, [0xA9, 0x17, 0x8D, 0x2D, 0x01])
+        # rom.write_bytes(0x41d1d, [0xA9, 0x17, 0x8D, 0x2D, 0x01])
+        rom.write_bytes(0x48d2a, [0xA9, 0x80, 0x02])
+
+    # Water cutscenes in Swamp Palace
+    if cutscenespeed in ["fast"]:
+        rom.write_bytes(0xF061, [0x02, 0x00]*3 + [0x02, 0x00]) # swamp palace table (rise)
+        rom.write_bytes(0xF061+8, [0x02, 0x00, 0x04, 0x00, 0x02, 0x00] + [0x02, 0x00]) # ()
+        rom.write_bytes(0xF18C+1, [0x29, 0x03]) # draw stream to every 4 ticks
+        rom.write_bytes(0xF1E1+1, [0x29, 0x03]) # draw rise to every 4 ticks
+        rom.write_bytes(0xEF32, [0xff, 0xff]*16) # swamp palace table (drain)
+        rom.write_bytes(0xEF32+35, [0x29, 0x03]) # lower every 4 ticks
+    elif cutscenespeed in ["blazing"]:
+        rom.write_bytes(0xF061, [0x02, 0x00]*3 + [0x02, 0x00]) # swamp palace table (rise)
+        rom.write_bytes(0xF061+8, [0x02, 0x00, 0x04, 0x00, 0x02, 0x00] + [0x02, 0x00]) # ()
+        rom.write_bytes(0xF18C+1, [0x29, 0x01]) # stream every other tick 
+        rom.write_bytes(0xF1E1+1, [0x29, 0x00]) # rise every tick
+        rom.write_bytes(0xEF32, [0xff, 0xff]*16) # swamp palace table (drain)
+        rom.write_bytes(0xEF32+35, [0x29, 0x00]) # lower every tick
+    elif cutscenespeed in ["slow"]: # no changes from default
+        rom.write_bytes(0xF061, [0x01, 0x00]*3 + [0xff, 0xff]) # swamp palace table (rise)
+        rom.write_bytes(0xF061+8, [0x01, 0x00, 0x02, 0x00, 0x01, 0x00] + [0xff, 0xff]) # ()
+        rom.write_bytes(0xF18C+1, [0x29, 0x03]) # stream every 4 ticks (based on variable 0x0424)
+        rom.write_bytes(0xF1E1+1, [0x29, 0x07]) # rise every 8 ticks
+        rom.write_bytes(0xEF32, [0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01, 0x00]*4) # swamp palace table (drain) (in JP it's EF32)
+        rom.write_bytes(0xEF32+35, [0x29, 0x07]) # lower every 8 ticks
+    else:
+        rom.write_bytes(0xF061, [0x01, 0x00]*3 + [0xff, 0xff]) # swamp palace table (rise)
+        rom.write_bytes(0xF061+8, [0x01, 0x00, 0x02, 0x00, 0x01, 0x00] + [0xff, 0xff]) # ()
+        rom.write_bytes(0xF18C+1, [0x29, 0x03]) # stream every 4 ticks (based on variable 0x0424)
+        rom.write_bytes(0xF1E1+1, [0x29, 0x07]) # rise every 8
+        rom.write_bytes(0xEF32, [0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01, 0x00]*4) # swamp palace table (drain) (in JP it's EF32)
+        rom.write_bytes(0xEF32+35, [0x29, 0x07]) # lower every 8
 
     rom.write_byte(0x18004B, 0x01 if quickswap else 0x00)
 
