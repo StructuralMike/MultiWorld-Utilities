@@ -249,8 +249,10 @@ def global_rules(world, player):
     set_rule(world.get_entrance('PoD Mimics 2 NW', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('PoD Bow Statue Down Ladder', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('PoD Map Balcony Drop Down', player), lambda state: state.has('Hammer', player))
-    set_rule(world.get_entrance('PoD Dark Pegs WN', player), lambda state: state.has('Hammer', player))
-    set_rule(world.get_entrance('PoD Dark Pegs Up Ladder', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('PoD Dark Pegs Hammer Path', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('PoD Dark Pegs Ladder Hammer Path', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('PoD Dark Pegs Ladder Cane Path', player), lambda state: state.has('Cane of Somaria', player))
+    set_rule(world.get_entrance('PoD Bow Statue Moving Wall Cane Path', player), lambda state: state.has('Cane of Somaria', player))
     set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Prize', player))
 
@@ -800,7 +802,9 @@ def no_glitches_rules(world, player):
         'PoD Callback': {'sewer': False, 'entrances': ['PoD Callback WS', 'PoD Callback Warp'], 'locations': [], 'easy_torches': []},
         'PoD Turtle Party': {'sewer': False, 'entrances': ['PoD Turtle Party ES', 'PoD Turtle Party NW'], 'locations': [], 'easy_torches': []},
         'PoD Lonely Turtle': {'sewer': False, 'entrances': ['PoD Lonely Turtle SW', 'PoD Lonely Turtle EN'], 'locations': [], 'easy_torches': []},
-        'PoD Dark Pegs': {'sewer': False, 'entrances': ['PoD Dark Pegs Up Ladder', 'PoD Dark Pegs WN'], 'locations': [], 'easy_torches': []},
+        'PoD Dark Pegs': {'sewer': False, 'entrances': ['PoD Dark Pegs Hammer Path', 'PoD Dark Pegs WN'], 'locations': [], 'easy_torches': []},
+        'PoD Dark Pegs Ladder': {'sewer': False, 'entrances': ['PoD Dark Pegs Up Ladder', 'PoD Dark Pegs Ladder Hammer Path', 'PoD Dark Pegs Ladder Cane Path'], 'locations': [], 'easy_torches': []},
+        'PoD Dark Pegs Switch': {'sewer': False, 'entrances': ['PoD Dark Pegs Switch Path'], 'locations': [], 'easy_torches': []},
         'PoD Dark Basement': {'sewer': False, 'entrances': ['PoD Dark Basement W Up Stairs', 'PoD Dark Basement E Up Stairs'], 'locations': ['Palace of Darkness - Dark Basement - Left', 'Palace of Darkness - Dark Basement - Right'], 'easy_torches': ['PoD Dark Basement W Up Stairs', 'PoD Dark Basement E Up Stairs', 'Palace of Darkness - Dark Basement - Left', 'Palace of Darkness - Dark Basement - Right']},
         'PoD Dark Maze': {'sewer': False, 'entrances': ['PoD Dark Maze EN', 'PoD Dark Maze E'], 'locations': ['Palace of Darkness - Dark Maze - Top', 'Palace of Darkness - Dark Maze - Bottom'], 'easy_torches': []},
         'Eastern Dark Square': {'sewer': False, 'entrances': ['Eastern Dark Square NW', 'Eastern Dark Square Key Door WN', 'Eastern Dark Square EN'], 'locations': [], 'easy_torches': []},
