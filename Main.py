@@ -279,12 +279,12 @@ def main(args, seed=None, fish=None):
     elif args.algorithm == 'balanced':
         distribute_items_restrictive(world, True)
 
-    if world.players > 1:
-        balance_multiworld_progression(world)
-
     logger.info("Filling Shop Slots")
 
     ShopSlotFill(world)
+
+    if world.players > 1:
+        balance_multiworld_progression(world)
 
     # if we only check for beatable, we can do this sanity check first before creating the rom
     if not world.can_beat_game():

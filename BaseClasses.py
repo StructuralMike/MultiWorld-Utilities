@@ -689,9 +689,9 @@ class CollectionState(object):
         new_locations = True
         while new_locations:
             reachable_events = {location for location in locations if location.event and
-                                (not key_only or (not self.world.keyshuffle[
-                                    location.item.player] and location.item.smallkey) or (not self.world.bigkeyshuffle[
-                                    location.item.player] and location.item.bigkey))
+                                (not key_only or
+                                 (not self.world.keyshuffle[location.item.player] and location.item.smallkey)
+                                 or (not self.world.bigkeyshuffle[location.item.player] and location.item.bigkey))
                                 and location.can_reach(self)}
             reachable_events = set(self._do_not_flood_the_keys(reachable_events))
             new_locations = reachable_events - self.events
