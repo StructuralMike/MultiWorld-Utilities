@@ -361,52 +361,35 @@ def generate_itempool(world, player: int):
 
     world.get_location('Ganon', player).event = True
     world.get_location('Ganon', player).locked = True
-    world.push_item(world.get_location('Agahnim 1', player), ItemFactory('Beat Agahnim 1', player), False)
-    world.get_location('Agahnim 1', player).event = True
-    world.get_location('Agahnim 1', player).locked = True
-    world.push_item(world.get_location('Agahnim 2', player), ItemFactory('Beat Agahnim 2', player), False)
-    world.get_location('Agahnim 2', player).event = True
-    world.get_location('Agahnim 2', player).locked = True
-    world.push_item(world.get_location('Dark Blacksmith Ruins', player), ItemFactory('Pick Up Purple Chest', player), False)
-    world.get_location('Dark Blacksmith Ruins', player).event = True
-    world.get_location('Dark Blacksmith Ruins', player).locked = True
-    world.push_item(world.get_location('Frog', player), ItemFactory('Get Frog', player), False)
-    world.get_location('Frog', player).event = True
-    world.get_location('Frog', player).locked = True
-    world.push_item(world.get_location('Missing Smith', player), ItemFactory('Return Smith', player), False)
-    world.get_location('Missing Smith', player).event = True
-    world.get_location('Missing Smith', player).locked = True
-    world.push_item(world.get_location('Floodgate', player), ItemFactory('Open Floodgate', player), False)
-    world.get_location('Floodgate', player).event = True
-    world.get_location('Floodgate', player).locked = True
-    world.push_item(world.get_location('Trench 1 Switch', player), ItemFactory('Trench 1 Filled', player), False)
-    world.get_location('Trench 1 Switch', player).event = True
-    world.get_location('Trench 1 Switch', player).locked = True
-    world.push_item(world.get_location('Trench 2 Switch', player), ItemFactory('Trench 2 Filled', player), False)
-    world.get_location('Trench 2 Switch', player).event = True
-    world.get_location('Trench 2 Switch', player).locked = True
-    world.push_item(world.get_location('Swamp Drain', player), ItemFactory('Drained Swamp', player), False)
-    world.get_location('Swamp Drain', player).event = True
-    world.get_location('Swamp Drain', player).locked = True
-    world.push_item(world.get_location('Attic Cracked Floor', player), ItemFactory('Shining Light', player), False)
-    world.get_location('Attic Cracked Floor', player).event = True
-    world.get_location('Attic Cracked Floor', player).locked = True
-    world.push_item(world.get_location('Suspicious Maiden', player), ItemFactory('Maiden Rescued', player), False)
-    world.get_location('Suspicious Maiden', player).event = True
-    world.get_location('Suspicious Maiden', player).locked = True
-    world.push_item(world.get_location('Revealing Light', player), ItemFactory('Maiden Unmasked', player), False)
-    world.get_location('Revealing Light', player).event = True
-    world.get_location('Revealing Light', player).locked = True
-    world.push_item(world.get_location('Ice Block Drop', player), ItemFactory('Convenient Block', player), False)
-    world.get_location('Ice Block Drop', player).event = True
-    world.get_location('Ice Block Drop', player).locked = True
+    event_pairs = [
+        ('Agahnim 1', 'Beat Agahnim 1'),
+        ('Agahnim 2', 'Beat Agahnim 2'),
+        ('Dark Blacksmith Ruins', 'Pick Up Purple Chest'),
+        ('Frog', 'Get Frog'),
+        ('Missing Smith', 'Return Smith'),
+        ('Floodgate', 'Open Floodgate'),
+        ('Trench 1 Switch', 'Trench 1 Filled'),
+        ('Trench 2 Switch', 'Trench 2 Filled'),
+        ('Swamp Drain', 'Drained Swamp'),
+        ('Attic Cracked Floor', 'Shining Light'),
+        ('Suspicious Maiden', 'Maiden Rescued'),
+        ('Revealing Light', 'Maiden Unmasked'),
+        ('Ice Block Drop', 'Convenient Block'),
+        ('Flute Activation Spot', 'Activated Flute')
+    ]
+
     if world.mode[player] == 'standard':
-        world.push_item(world.get_location('Zelda Pickup', player), ItemFactory('Zelda Herself', player), False)
-        world.get_location('Zelda Pickup', player).event = True
-        world.get_location('Zelda Pickup', player).locked = True
-        world.push_item(world.get_location('Zelda Drop Off', player), ItemFactory('Zelda Delivered', player), False)
-        world.get_location('Zelda Drop Off', player).event = True
-        world.get_location('Zelda Drop Off', player).locked = True
+        event_pairs += [
+            ('Zelda Pickup', 'Zelda Herself'),
+            ('Zelda Drop Off', 'Zelda Delivered')
+        ]
+
+    for location_name, event_name in event_pairs:
+        location = world.get_location(location_name, player)
+        event = ItemFactory(event_name, player)
+        world.push_item(location, event, False)
+        location.event = location.locked = True
+
 
     # set up item pool
     additional_triforce_pieces = 0
@@ -499,7 +482,7 @@ def generate_itempool(world, player: int):
     progressionitems = []
     nonprogressionitems = []
     for item in items:
-        if item.advancement or item.priority or item.type:
+        if item.advancement or item.type:
             progressionitems.append(item)
         elif world.beemizer[player] and item.name in trap_replaceable:
             if world.random.random() < world.beemizer[item.player] * 0.25:

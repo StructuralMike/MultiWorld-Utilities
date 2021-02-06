@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '5c7b48f433149d10e177dc0a0bcce76b'
+RANDOMIZERBASEHASH = '8d188969dcfa10a8aa90427268e9c1c1'
 
 import io
 import itertools
@@ -852,16 +852,18 @@ def patch_rom(world, rom, player, team, enemized):
     for door in world.doors:
         if door.dest is not None and isinstance(door.dest, Door) and\
              door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs,
-                                                     DoorType.Open, DoorType.StraightStairs]:
+                                                     DoorType.Open, DoorType.StraightStairs, DoorType.Ladder]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door))
     for paired_door in world.paired_doors[player]:
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
         rom.write_bytes(paired_door.address_b(world, player), paired_door.rom_data_b(world, player))
     if world.doorShuffle[player] != "vanilla":
         for builder in world.dungeon_layouts[player].values():
-            if builder.pre_open_stonewall and builder.pre_open_stonewall.name == 'Desert Wall Slide NW':
-                dr_flags |= DROptions.Open_Desert_Wall
-                break
+            for stonewall in builder.pre_open_stonewalls:
+                if stonewall.name == 'Desert Wall Slide NW':
+                    dr_flags |= DROptions.Open_Desert_Wall
+                elif stonewall.name == 'PoD Bow Statue Down Ladder':
+                    dr_flags |= DROptions.Open_PoD_Wall
         for name, pair in boss_indicator.items():
             dungeon_id, boss_door = pair
             opposite_door = world.get_door(boss_door, player).dest
@@ -933,8 +935,6 @@ def patch_rom(world, rom, player, team, enemized):
             rom.write_byte(0x118B87, 0xC2)
 
     credits_total = 216
-    if world.goal[player] == 'icerodhunt':  # Impossible to get 216/216 with Ice rod hunt. Most possible is 215/216.
-        credits_total -= 1
     if world.retro[player]:  # Old man cave and Take any caves will count towards collection rate.
         credits_total += 5
     if world.shop_shuffle_slots[player]:  # Potion shop only counts towards collection rate if included in the shuffle.
@@ -2118,6 +2118,9 @@ def write_strings(rom, world, player, team):
         tt['kakariko_flophouse_man_no_flippers'] = 'I really hate mowing my yard.\n{PAGEBREAK}\nI should move.'
         tt['kakariko_flophouse_man'] = 'I really hate mowing my yard.\n{PAGEBREAK}\nI should move.'
 
+    if world.mode[player] == 'inverted':
+        tt['sign_village_of_outcasts'] = 'attention\nferal ducks sighted\nhiding in statues\n\nflute players beware\n'
+
     def hint_text(dest, ped_hint=False):
         if not dest:
             return "nothing"
@@ -2496,6 +2499,10 @@ def set_inverted_mode(world, player, rom):
     rom.write_byte(snes_to_pc(0x05AF79), 0xF0)
     rom.write_byte(snes_to_pc(0x0DB3C5), 0xC6)
     rom.write_byte(snes_to_pc(0x07A3F4), 0xF0)  # duck
+    rom.write_byte(0xDC21D, 0x6B)  # inverted mode flute activation (skip weathervane overlay)
+    rom.write_bytes(0x48DB3, [0xF8, 0x01])  # inverted mode (bird X)
+    rom.write_byte(0x48D5E, 0x01)  # inverted mode (rock X)
+    rom.write_bytes(0x48CC1+36, bytes([0xF8]*12)) # (rock X)
     rom.write_int16s(snes_to_pc(0x02E849),
                      [0x0043, 0x0056, 0x0058, 0x006C, 0x006F, 0x0070, 0x007B, 0x007F, 0x001B])  # dw flute
     rom.write_int16(snes_to_pc(0x02E8D5), 0x07C8)

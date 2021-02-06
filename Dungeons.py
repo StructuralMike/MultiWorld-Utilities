@@ -122,8 +122,6 @@ def fill_dungeons_restrictive(world):
     for item in world.get_items():
         if (item.smallkey and world.keyshuffle[item.player]) or (item.bigkey and world.bigkeyshuffle[item.player]):
             item.advancement = True
-        elif (item.map and world.mapshuffle[item.player]) or (item.compass and world.compassshuffle[item.player]):
-            item.priority = True
 
     dungeon_items = [item for item in get_dungeon_item_pool(world) if (((item.smallkey and not world.keyshuffle[item.player])
                                                                        or (item.bigkey and not world.bigkeyshuffle[item.player])
@@ -201,8 +199,8 @@ pod_regions = [
     'PoD Map Balcony', 'PoD Conveyor', 'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room',
     'PoD Stalfos Basement', 'PoD Basement Ledge', 'PoD Big Key Landing', 'PoD Falling Bridge',
     'PoD Falling Bridge Ledge', 'PoD Dark Maze', 'PoD Big Chest Balcony', 'PoD Compass Room', 'PoD Dark Basement',
-    'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue', 'PoD Dark Pegs', 'PoD Lonely Turtle', 'PoD Turtle Party',
-    'PoD Dark Alley', 'PoD Callback', 'PoD Boss', 'Palace of Darkness Portal'
+    'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue', 'PoD Bow Statue Moving Wall', 'PoD Dark Pegs', 'PoD Dark Pegs Ladder', 'PoD Dark Pegs Switch',
+    'PoD Lonely Turtle', 'PoD Turtle Party', 'PoD Dark Alley', 'PoD Callback', 'PoD Boss', 'Palace of Darkness Portal'
 ]
 
 swamp_regions = [

@@ -508,7 +508,7 @@ class World(object):
     def get_spheres(self):
         state = CollectionState(self)
 
-        locations = {location for location in self.get_locations()}
+        locations = set(self.get_locations())
 
         while locations:
             sphere = set()
@@ -689,9 +689,9 @@ class CollectionState(object):
         new_locations = True
         while new_locations:
             reachable_events = {location for location in locations if location.event and
-                                (not key_only or (not self.world.keyshuffle[
-                                    location.item.player] and location.item.smallkey) or (not self.world.bigkeyshuffle[
-                                    location.item.player] and location.item.bigkey))
+                                (not key_only or
+                                 (not self.world.keyshuffle[location.item.player] and location.item.smallkey)
+                                 or (not self.world.bigkeyshuffle[location.item.player] and location.item.bigkey))
                                 and location.can_reach(self)}
             reachable_events = set(self._do_not_flood_the_keys(reachable_events))
             new_locations = reachable_events - self.events
@@ -862,10 +862,6 @@ class CollectionState(object):
 
     def has_fire_source(self, player: int) -> bool:
         return self.has('Fire Rod', player) or self.has('Lamp', player)
-
-    def can_flute(self, player: int) -> bool:
-        lw = self.world.get_region('Light World', player)
-        return self.has('Flute', player) and lw.can_reach(self) and self.is_not_bunny(lw, player)
 
     def can_melt_things(self, player: int) -> bool:
         return self.has('Fire Rod', player) or \
@@ -1237,7 +1233,7 @@ hook_dir_map = {
 def hook_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
-    if door.type in [DoorType.Normal, DoorType.Open, DoorType.StraightStairs]:
+    if door.type in [DoorType.Normal, DoorType.Open, DoorType.StraightStairs, DoorType.Ladder]:
         return hook_dir_map[door.direction]
     return None
 
@@ -1355,7 +1351,8 @@ class Door(object):
 
         # rom properties
         self.roomIndex = -1
-        # 0,1,2 + Direction (N:0, W:3, S:6, E:9) for normal
+        # 0,1,2 for normal
+        # 0-7 for ladder
         # 0-4 for spiral offset thing
         self.doorIndex = -1
         self.layer = -1  # 0 for normal floor, 1 for the inset layer
@@ -1406,6 +1403,8 @@ class Door(object):
             return 0x13A000 + normal_offset_table[self.roomIndex] * 24 + (self.doorIndex + self.direction.value * 3) * 2
         elif self.type == DoorType.SpiralStairs:
             return 0x13B000 + (spiral_offset_table[self.roomIndex] + self.doorIndex) * 4
+        elif self.type == DoorType.Ladder:
+            return 0x13C700 + self.doorIndex * 2
         elif self.type == DoorType.Open:
             base_address = {
                 Direction.North: 0x13C500,
@@ -1422,6 +1421,12 @@ class Door(object):
             if src.type == DoorType.StraightStairs:
                 bitmask += 0x40
             return [self.roomIndex, bitmask + self.doorIndex]
+        if self.type == DoorType.Ladder:
+            bitmask = 4 * (self.layer ^ 1 if src.toggle else self.layer)
+            bitmask += 0x08 * self.doorIndex
+            if src.type == DoorType.StraightStairs:
+                bitmask += 0x40
+            return [self.roomIndex, bitmask + 0x03]
         if self.type == DoorType.SpiralStairs:
             bitmask = int(self.layer) << 2
             bitmask += 0x10 * int(self.zeroHzCam)
@@ -1860,11 +1865,12 @@ class Location():
 
 
 class Item(object):
+    location: Optional[Location] = None
+    world: Optional[World] = None
 
-    def __init__(self, name='', advancement=False, priority=False, type=None, code=None, pedestal_hint=None, pedestal_credit=None, sickkid_credit=None, zora_credit=None, witch_credit=None, fluteboy_credit=None, hint_text=None, player=None):
+    def __init__(self, name='', advancement=False, type=None, code=None, pedestal_hint=None, pedestal_credit=None, sickkid_credit=None, zora_credit=None, witch_credit=None, fluteboy_credit=None, hint_text=None, player=None):
         self.name = name
         self.advancement = advancement
-        self.priority = priority
         self.type = type
         self.pedestal_hint_text = pedestal_hint
         self.pedestal_credit_text = pedestal_credit
@@ -1874,12 +1880,15 @@ class Item(object):
         self.fluteboy_credit_text = fluteboy_credit
         self.hint_text = hint_text
         self.code = code
-        self.location = None
-        self.world = None
         self.player = player
 
     def __eq__(self, other):
         return self.name == other.name and self.player == other.player
+
+    def __lt__(self, other):
+        if other.player != self.player:
+            return other.player < self.player
+        return self.name < other.name
 
     def __hash__(self):
         return hash((self.name, self.player))
