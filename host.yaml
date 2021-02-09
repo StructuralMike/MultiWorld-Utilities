@@ -6,6 +6,7 @@ general_options:
   # Set this to false to never autostart a rom (such as after patching)
   # True for operating system default program
   # Alternatively, a path to a program to open the .sfc file with
+  rom_start: false
   # Where to place output files
   output_path: "output"
 # Options for MultiServer
@@ -27,6 +28,7 @@ server_options:
   # Points given to a player for each acquired item in their world
   location_check_points: 1
   # Point cost to receive a hint via !hint for players
+  hint_cost: 25 # Set to 0 if you want free hints
   # Forfeit modes
   # "disabled" -> clients can't forfeit,
   # "enabled" -> clients can always forfeit
