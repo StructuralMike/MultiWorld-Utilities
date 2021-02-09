@@ -33,12 +33,14 @@ server_options:
   # "auto" -> automatic forfeit on goal completion, "goal" -> clients can forfeit after achieving their goal
   # "auto-enabled" -> automatic forfeit on goal completion and manual forfeit is also enabled
   # Warning: Only Berserker's Multiworld clients of version 2.1+ send game beaten information
+  forfeit_mode: "auto-enabled"
   # Remaining modes
   # !remaining handling, that tells a client which items remain in their pool
   # "enabled" -> Client can always ask for remaining items
   # "disabled" -> Client can never ask for remaining items
   # "goal" -> Client can ask for remaining items after goal completion
   # Warning: Only Berserker's Multiworld clients of version 2.1+ send game beaten information
+  remaining_mode: "enabled"
   # Automatically shut down the server after this many seconds without new location checks, 0 to keep running
   auto_shutdown: 0
   # Compatibility handling
@@ -97,7 +99,24 @@ multi_mystery_options:
   race: 0
   # List of options that can be plando'd. Can be combined, for example "bosses, items"
   # Available options: bosses, items, texts, connections
+<<<<<<< Updated upstream
   plando_options: "items, texts, connections"
+=======
   plando_options: "bosses,items,connections,texts"
+  ##Doors options
+  # How many cpu threads should be used to roll seeds in parallel.
+  # set to 0 for it to mimic the amount of hardware threads you have, otherwise use a positive number to set the max number of threads in parallel to limit resources used.
   cpu_threads: 0
   # How many seeds should be attempted. This is useful for Door Rando, since some to many of them can fail.
+  # set to 0 for it to mimic the amount of hardware threads you have, otherwise use a positive number for the amount of attempts it should do.
+  max_attempts: 0
+  #When using max_attempts, this controls if the first one that works in order of starting should be taken, or the first one in order of completion time should be taken
+  #keep in mind, that turning this on, will skew the randomness into "simpler" seeds, as they generate quicker
+  take_first_working: False
+  #When using max_attempts, this controls if all successful seeds will be kept.
+  keep_all_seeds: False
+  #When logging is desired, this specifies the path to output the logs to. null for no output logs.
+  log_output_path: "Output Logs"
+  #When logging is desired, this specifies the log level to apply. null for default. Options are 'error', 'warning', 'info', 'debug'
+  log_level: null
+>>>>>>> Stashed changes
