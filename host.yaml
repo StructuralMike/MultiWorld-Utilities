@@ -6,7 +6,6 @@ general_options:
   # Set this to false to never autostart a rom (such as after patching)
   # True for operating system default program
   # Alternatively, a path to a program to open the .sfc file with
-  rom_start: true
   # Where to place output files
   output_path: "output"
 # Options for MultiServer
@@ -28,21 +27,18 @@ server_options:
   # Points given to a player for each acquired item in their world
   location_check_points: 1
   # Point cost to receive a hint via !hint for players
-  hint_cost: 1000 # Set to 0 if you want free hints
   # Forfeit modes
   # "disabled" -> clients can't forfeit,
   # "enabled" -> clients can always forfeit
   # "auto" -> automatic forfeit on goal completion, "goal" -> clients can forfeit after achieving their goal
   # "auto-enabled" -> automatic forfeit on goal completion and manual forfeit is also enabled
   # Warning: Only Berserker's Multiworld clients of version 2.1+ send game beaten information
-  forfeit_mode: "goal"
   # Remaining modes
   # !remaining handling, that tells a client which items remain in their pool
   # "enabled" -> Client can always ask for remaining items
   # "disabled" -> Client can never ask for remaining items
   # "goal" -> Client can ask for remaining items after goal completion
   # Warning: Only Berserker's Multiworld clients of version 2.1+ send game beaten information
-  remaining_mode: "goal"
   # Automatically shut down the server after this many seconds without new location checks, 0 to keep running
   auto_shutdown: 0
   # Compatibility handling
@@ -102,3 +98,6 @@ multi_mystery_options:
   # List of options that can be plando'd. Can be combined, for example "bosses, items"
   # Available options: bosses, items, texts, connections
   plando_options: "items, texts, connections"
+  plando_options: "bosses,items,connections,texts"
+  cpu_threads: 0
+  # How many seeds should be attempted. This is useful for Door Rando, since some to many of them can fail.
