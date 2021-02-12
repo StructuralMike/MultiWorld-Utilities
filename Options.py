@@ -67,6 +67,7 @@ class WorldState(Choice):
     standard = auto()
     open = auto()
     retro = auto()
+    futuro = auto()
     inverted = auto()
 
 

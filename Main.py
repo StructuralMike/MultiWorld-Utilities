@@ -43,7 +43,7 @@ def main(args, seed=None):
     # initialize the world
     world = World(args.multi, args.shuffle, args.logic, args.mode, args.swords, args.difficulty,
                   args.item_functionality, args.timer, args.progressive.copy(), args.goal, args.algorithm,
-                  args.accessibility, args.shuffleganon, args.retro, args.custom, args.customitemarray, args.hints)
+                  args.accessibility, args.shuffleganon, args.retro, args.futuro, args.custom, args.customitemarray, args.hints)
 
     logger = logging.getLogger('')
     world.seed = get_seed(seed)
@@ -297,9 +297,10 @@ def main(args, seed=None):
           "retro": world.retro[player],                                    # 9
           "progressive": world.progressive,                                # A
           "hints": 'True' if world.hints[player] else 'False'              # B
+          "futuro": world.futuro[player]                                   # C
         }
-        #                  0  1  2  3  4 5  6  7 8 9 A B
-        outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s-%s%s%s%s%s' % (
+        #                  0  1  2  3  4 5  6  7 8 9 A B C
+        outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s-%s%s%s%s%s%s' % (
           #  0          1      2      3    4     5    6      7     8        9         A     B           C
           # _noglitches_normal-normal-open-ganon-ohko_simple-balanced-keysanity-retro-prog_random-nohints
           # _noglitches_normal-normal-open-ganon     _simple-balanced-keysanity-retro
@@ -320,6 +321,7 @@ def main(args, seed=None):
           "-retro" if outfilestuffs["retro"] == "True" else "",  # 9
           "-prog_" + outfilestuffs["progressive"] if outfilestuffs["progressive"] in ['off', 'random'] else "",  # A
           "-nohints" if not outfilestuffs["hints"] == "True" else "")  # B
+          "-futuro" if outfilestuffs["futuro"] == "True" else "" # C
         ) if not args.outputname else ''
         rompath = output_path(f'{outfilebase}{outfilepname}{outfilesuffix}.sfc')
         rom.write_to_file(rompath, hide_enemizer=True)
@@ -465,7 +467,7 @@ def main(args, seed=None):
 
 def copy_world(world):
     # ToDo: Not good yet
-    ret = World(world.players, world.shuffle, world.logic, world.mode, world.swords, world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm, world.accessibility, world.shuffle_ganon, world.retro, world.custom, world.customitemarray, world.hints)
+    ret = World(world.players, world.shuffle, world.logic, world.mode, world.swords, world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm, world.accessibility, world.shuffle_ganon, world.retro, world.futuro, world.custom, world.customitemarray, world.hints)
     ret.teams = world.teams
     ret.player_names = copy.deepcopy(world.player_names)
     ret.remote_items = world.remote_items.copy()

@@ -27,7 +27,7 @@ class World(object):
 
     def __init__(self, players: int, shuffle, logic, mode, swords, difficulty, difficulty_adjustments, timer,
                  progressive,
-                 goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
+                 goal, algorithm, accessibility, shuffle_ganon, retro, futuro, custom, customitemarray, hints):
         if self.debug_types:
             import inspect
             methods = inspect.getmembers(self, predicate=inspect.ismethod)
@@ -73,6 +73,7 @@ class World(object):
         self.shuffle_ganon = shuffle_ganon
         self.fix_gtower_exit = self.shuffle_ganon
         self.retro = retro.copy()
+        self.futuro = futuro.copy()
         self.custom = custom
         self.customitemarray: List[int] = customitemarray
         self.hints = hints.copy()
@@ -83,6 +84,9 @@ class World(object):
         for player in range(1, players + 1):
             def set_player_attr(attr, val):
                 self.__dict__.setdefault(attr, {})[player] = val
+            # If World State is Futuro, set Futuro flag
+            if self.mode[player] == "futuro":
+                self.futuro[player] = True
             set_player_attr('_region_cache', {})
             set_player_attr('player_names', [])
             set_player_attr('remote_items', False)
@@ -705,7 +709,14 @@ class CollectionState(object):
                 or (self.has('Cane of Byrna', player) and (enemies < 6 or self.can_extend_magic(player)))
                 or self.can_shoot_arrows(player)
                 or self.has('Fire Rod', player)
-                or (self.has('Bombs (10)', player) and enemies < 6))
+                or (self.has('Bombs (10)', player) and enemies < 6 and self.can_bomb_walls(player))
+                or self.can_bomb_walls(player))
+
+    def can_bomb_walls(self, player: int) -> bool:
+        if self.world.futuro[player]:
+            return self.has('Bomb Upgrade (+10)', player)
+        else:
+            return True
 
     def can_shoot_arrows(self, player: int) -> bool:
         if self.world.retro[player]:
@@ -1292,6 +1303,7 @@ class Spoiler(object):
                          'dark_room_logic': self.world.dark_room_logic,
                          'mode': self.world.mode,
                          'retro': self.world.retro,
+                         'futuro': self.world.futuro,
                          'weapons': self.world.swords,
                          'goal': self.world.goal,
                          'shuffle': self.world.shuffle,
@@ -1378,6 +1390,8 @@ class Spoiler(object):
                 outfile.write('Mode:                            %s\n' % self.metadata['mode'][player])
                 outfile.write('Retro:                           %s\n' %
                               ('Yes' if self.metadata['retro'][player] else 'No'))
+                outfile.write('Futuro:                           %s\n' %
+                              ('Yes' if self.metadata['futuro'][player] else 'No'))
                 outfile.write('Swords:                          %s\n' % self.metadata['weapons'][player])
                 outfile.write('Goal:                            %s\n' % self.metadata['goal'][player])
                 if "triforce" in self.metadata["goal"][player]:  # triforce hunt

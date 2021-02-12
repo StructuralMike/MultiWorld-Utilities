@@ -559,6 +559,7 @@ def get_pool_core(world, player: int):
     swords = world.swords[player]
     retro = world.retro[player]
     logic = world.logic[player]
+    futuro = world.futuro[player]
 
     pool = []
     placed_items = {}
@@ -709,6 +710,7 @@ def get_pool_core(world, player: int):
             place_item(key_location, item_to_place)
         else:
             pool.extend([item_to_place])
+
     return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon,
             additional_pieces_to_place)
 

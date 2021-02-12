@@ -419,6 +419,8 @@ def roll_settings(weights, plando_options: typing.Set[str] = frozenset(("bosses"
         ret.mode = get_choice("mode", weights)
         ret.retro = get_choice("retro", weights)
 
+    ret.futuro = get_choice("futuro", weights)
+
     ret.hints = get_choice('hints', weights)
 
     ret.swords = {'randomized': 'random',

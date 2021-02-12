@@ -1038,7 +1038,7 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_bytes(0x184000, [
         # original_item, limit, replacement_item, filler
         0x12, 0x01, 0x35, 0xFF,  # lamp -> 5 rupees
-        0x51, 0x06, 0x52, 0xFF,  # 6 +5 bomb upgrades -> +10 bomb upgrade
+        0x52 if world.futuro[player] else 0x51, 0x01 if world.futuro[player] else 0x06, 0x51 if world.futuro[player] else 0x52, 0xFF,  # 1/6 +10/5 bomb upgrades -> +5/10 bomb upgrade
         0x53, 0x06, 0x54, 0xFF,  # 6 +5 arrow upgrades -> +10 arrow upgrade
         0x58, 0x01, 0x36 if world.retro[player] else 0x43, 0xFF,  # silver arrows -> single arrow (red 20 in retro mode)
         0x3E, difficulty.boss_heart_container_limit, 0x47, 0xff,  # boss heart -> green 20
