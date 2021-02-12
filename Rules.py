@@ -467,7 +467,7 @@ def global_rules(world, player):
     # End of door rando rules.
 
     add_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
-    set_rule(world.get_entrance('Ganon Drop', player), lambda state: state.has_beam_sword(player) or (state.has('Hammer', player) and (world.difficulty_adjustments[player] == "easy" or world.swords[player] == "swordless")))  # need to damage ganon to get tiles to drop
+    set_rule(world.get_entrance('Ganon Drop', player), lambda state: state.has_beam_sword(player) or (state.has('Hammer', player) and (world.item_functionality[player] == "easy" or world.swords[player] == "swordless")))  # need to damage ganon to get tiles to drop
 
     set_rule(world.get_location('Flute Activation Spot', player), lambda state: state.has('Flute', player))
 

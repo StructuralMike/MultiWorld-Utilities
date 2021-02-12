@@ -356,7 +356,7 @@ def main(args, seed=None, fish=None):
         outfilestuffs = {
           "logic": world.logic[player],                                   # 0
           "difficulty": world.difficulty[player],                         # 1
-          "difficulty_adjustments": world.item_functionality[player], # 2
+          "item_functionality": world.item_functionality[player], # 2
           "mode": world.mode[player],                                     # 3
           "goal": world.goal[player],                                     # 4
           "timer": str(world.timer[player]),                                      # 5
