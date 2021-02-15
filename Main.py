@@ -94,6 +94,7 @@ def main(args, seed=None):
     world.plando_connections = args.plando_connections.copy()
     world.restrict_dungeon_item_on_boss = args.restrict_dungeon_item_on_boss.copy()
     world.required_medallions = args.required_medallions.copy()
+    world.startinventory = args.startinventory.copy()
 
     world.rom_seeds = {player: random.Random(world.random.randint(0, 999999999)) for player in range(1, world.players + 1)}
 
@@ -120,10 +121,6 @@ def main(args, seed=None):
         else:
             world.open_pyramid[player] = {'on': True, 'off': False, 'yes': True, 'no': False}.get(world.open_pyramid[player], world.open_pyramid[player])
 
-        for tok in filter(None, args.startinventory[player].split(',')):
-            item = ItemFactory(tok.strip(), player)
-            if item:
-                world.push_precollected(item)
         # item in item_table gets checked in mystery, but not CLI - so we double-check here
         world.local_items[player] = {item.strip() for item in args.local_items[player].split(',') if
                                      item.strip() in item_table}
