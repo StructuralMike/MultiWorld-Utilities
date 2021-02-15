@@ -28,14 +28,14 @@ server_options:
   # Points given to a player for each acquired item in their world
   location_check_points: 1
   # Point cost to receive a hint via !hint for players
-  hint_cost: 1000 # Set to 0 if you want free hints
+  hint_cost: 25 # Set to 0 if you want free hints
   # Forfeit modes
   # "disabled" -> clients can't forfeit,
   # "enabled" -> clients can always forfeit
   # "auto" -> automatic forfeit on goal completion, "goal" -> clients can forfeit after achieving their goal
   # "auto-enabled" -> automatic forfeit on goal completion and manual forfeit is also enabled
   # Warning: Only Berserker's Multiworld clients of version 2.1+ send game beaten information
-  forfeit_mode: "goal"
+  forfeit_mode: "auto-enabled"
   # Remaining modes
   # !remaining handling, that tells a client which items remain in their pool
   # "enabled" -> Client can always ask for remaining items
@@ -101,14 +101,14 @@ multi_mystery_options:
   race: 0
   # List of options that can be plando'd. Can be combined, for example "bosses, items"
   # Available options: bosses, items, texts, connections
-  plando_options: "bosses"
+  plando_options: "items,texts,bosses,connections"
   ##Doors options
   # How many cpu threads should be used to roll seeds in parallel.
   # set to 0 for it to mimic the amount of hardware threads you have, otherwise use a positive number to set the max number of threads in parallel to limit resources used.
   cpu_threads: 0
   # How many seeds should be attempted. This is useful for Door Rando, since some to many of them can fail.
   # set to 0 for it to mimic the amount of hardware threads you have, otherwise use a positive number for the amount of attempts it should do.
-  max_attempts: 0
+  max_attempts: 128
   #When using max_attempts, this controls if the first one that works in order of starting should be taken, or the first one in order of completion time should be taken
   #keep in mind, that turning this on, will skew the randomness into "simpler" seeds, as they generate quicker
   take_first_working: False
