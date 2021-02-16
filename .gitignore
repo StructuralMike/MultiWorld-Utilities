@@ -63,3 +63,4 @@ output/
 Output Logs/
 
 vanilla-errors.txt
+*.zspr
