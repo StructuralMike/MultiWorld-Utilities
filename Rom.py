@@ -939,6 +939,31 @@ def patch_rom(world, rom, player, team, enemized):
 
     difficulty = world.difficulty_requirements[player]
 
+    if world.futuro[player]:
+        # Fire and ice rod cost
+        rom.write_bytes(0x3B070, [0x81, 0x10, 0x08])
+        # Medallion magic cost
+        rom.write_bytes(0x3B073, [0x81, 0x20, 0x10])
+        # Powder cost
+        rom.write_bytes(0x3B076, [0x81, 0x08, 0x04])
+        # Unknown
+        rom.write_bytes(0x3B079, [0x08, 0x04, 0x02])
+        # Somaria cost
+        rom.write_bytes(0x3B07C, [0x81, 0x08, 0x04])
+        # Unknown
+        rom.write_bytes(0x3B07F, [0x10, 0x08, 0x04])
+        # Lamp cost
+        rom.write_bytes(0x3B082, [0x81, 0x04, 0x02])
+        # Unknown
+        rom.write_bytes(0x3B085, [0x08, 0x04, 0x02])
+        # Byrna activation cost
+        rom.write_bytes(0x3B088, [0x81, 0x10, 0x08])
+
+        # Cape magic cost
+        rom.write_bytes(0x3ADA7, [0x01, 0x04, 0x08])
+        # Byrna residual magic cost
+        rom.write_bytes(0x45C42, [0x81, 0x04, 0x02])
+
     # Set overflow items for progressive equipment
     rom.write_bytes(0x180090,
                     [difficulty.progressive_sword_limit if world.swords[player] != 'swordless' else 0,
@@ -1038,7 +1063,7 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_bytes(0x184000, [
         # original_item, limit, replacement_item, filler
         0x12, 0x01, 0x35, 0xFF,  # lamp -> 5 rupees
-        0x52 if world.futuro[player] else 0x51, 0x01 if world.futuro[player] else 0x06, 0x51 if world.futuro[player] else 0x52, 0xFF,  # 1/6 +10/5 bomb upgrades -> +5/10 bomb upgrade
+        0x51, 0x06, 0x52, 0xFF,  # 6 +10 bomb upgrades -> +5 bomb upgrade
         0x53, 0x06, 0x54, 0xFF,  # 6 +5 arrow upgrades -> +10 arrow upgrade
         0x58, 0x01, 0x36 if world.retro[player] else 0x43, 0xFF,  # silver arrows -> single arrow (red 20 in retro mode)
         0x3E, difficulty.boss_heart_container_limit, 0x47, 0xff,  # boss heart -> green 20

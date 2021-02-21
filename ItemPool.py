@@ -718,15 +718,28 @@ def get_pool_core(world, player: int):
         else:
             pool.extend([item_to_place])
 
+    if futuro:
+        magic_count = 0
+        bomb_count = 0
+        for item in pool:
+            if item == 'Magic Upgrade (1/2)':
+                magic_count += 1
+            if item == 'Bomb Upgrade (+10)':
+                bomb_count += 1
+        if 'Magic Upgrade (1/4)' not in pool and magic_count < 2:
+            pool.append('Magic Upgrade (1/2)')
+        if bomb_count == 0:
+            pool.extend(['Bomb Upgrade (+10)']*2)
+        elif bomb_count == 1 :
+            pool.append('Bomb Upgrade (+10)')
+
+
     # Remove starting inventory items from the item pool and replace it with 20 rupees, if suitable and possible.
     for item in startinventory:
         precollected_items.append(item.name)
-        if item.name not in trap_replaceable:
-            try:
-                pool.remove(item.name)
-                pool.append('Rupees (20)')
-            except:
-                pass
+        if item.name not in trap_replaceable and item.name in pool:
+            pool.remove(item.name)
+            pool.append('Rupees (20)')
 
     return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon,
             additional_pieces_to_place)

@@ -293,7 +293,7 @@ def main(args, seed=None):
           "mscb": mcsb_name,                                               # 8
           "retro": world.retro[player],                                    # 9
           "progressive": world.progressive,                                # A
-          "hints": 'True' if world.hints[player] else 'False'              # B
+          "hints": 'True' if world.hints[player] else 'False',             # B
           "futuro": world.futuro[player]                                   # C
         }
         #                  0  1  2  3  4 5  6  7 8 9 A B C
@@ -317,7 +317,7 @@ def main(args, seed=None):
 
           "-retro" if outfilestuffs["retro"] == "True" else "",  # 9
           "-prog_" + outfilestuffs["progressive"] if outfilestuffs["progressive"] in ['off', 'random'] else "",  # A
-          "-nohints" if not outfilestuffs["hints"] == "True" else "")  # B
+          "-nohints" if not outfilestuffs["hints"] == "True" else ""),  # B
           "-futuro" if outfilestuffs["futuro"] == "True" else "" # C
         ) if not args.outputname else ''
         rompath = output_path(f'{outfilebase}{outfilepname}{outfilesuffix}.sfc')

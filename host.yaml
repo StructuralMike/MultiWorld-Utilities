@@ -101,9 +101,6 @@ multi_mystery_options:
   race: 0
   # List of options that can be plando'd. Can be combined, for example "bosses, items"
   # Available options: bosses, items, texts, connections
-<<<<<<< Updated upstream
-  plando_options: "items, texts, connections"
-=======
   plando_options: "bosses,items,connections,texts"
   ##Doors options
   # How many cpu threads should be used to roll seeds in parallel.
@@ -121,4 +118,3 @@ multi_mystery_options:
   log_output_path: "Output Logs"
   #When logging is desired, this specifies the log level to apply. null for default. Options are 'error', 'warning', 'info', 'debug'
   log_level: null
->>>>>>> Stashed changes
