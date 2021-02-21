@@ -376,7 +376,11 @@ def generate_itempool(world, player: int):
             world.itempool.append(ItemFactory('Nothing', player))
             world.push_precollected(item)
     else:
-        world.itempool.extend([item for item in dungeon_items])
+        for item in dungeon_items:
+            if item.name in precollected_items:
+                world.itempool.append(ItemFactory('Rupees (20)', player))
+            else:
+                world.itempool.append(item)
 
     # logic has some branches where having 4 hearts is one possible requirement (of several alternatives)
     # rather than making all hearts/heart pieces progression items (which slows down generation considerably)
@@ -561,6 +565,9 @@ def get_pool_core(world, player: int):
     logic = world.logic[player]
     futuro = world.futuro[player]
 
+    startinventory = [item for item in [ItemFactory(tok.strip(), player) for tok in filter(None, world.startinventory[player].split(','))] if item] 
+    start_bottle_count = len([item for item in startinventory if item.name.startswith('Bottle')])
+
     pool = []
     placed_items = {}
     precollected_items = []
@@ -606,7 +613,7 @@ def get_pool_core(world, player: int):
     # expert+ difficulties produce the same contents for
     # all bottles, since only one bottle is available
     thisbottle = None
-    for _ in range(diff.bottle_count):
+    for _ in range(max([1,diff.bottle_count - start_bottle_count])):
         if not diff.same_bottle or not thisbottle:
             thisbottle = world.random.choice(diff.bottles)
         pool.append(thisbottle)
@@ -710,6 +717,16 @@ def get_pool_core(world, player: int):
             place_item(key_location, item_to_place)
         else:
             pool.extend([item_to_place])
+
+    # Remove starting inventory items from the item pool and replace it with 20 rupees, if suitable and possible.
+    for item in startinventory:
+        precollected_items.append(item.name)
+        if item.name not in trap_replaceable:
+            try:
+                pool.remove(item.name)
+                pool.append('Rupees (20)')
+            except:
+                pass
 
     return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon,
             additional_pieces_to_place)
