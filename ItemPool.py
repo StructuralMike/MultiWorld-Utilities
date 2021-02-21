@@ -7,7 +7,7 @@ from Bosses import place_bosses
 from Dungeons import get_dungeon_item_pool
 from EntranceShuffle import connect_entrance
 from Fill import FillError, fill_restrictive
-from Items import ItemFactory, trap_replaceable
+from Items import ItemFactory, GetBeemizerItem
 from Rules import forbid_items_for_player
 
 # This file sets the item pools for various modes. Timed modes and triforce hunt are enforced first, and then extra items are specified per mode to fill in the remaining space.
@@ -373,7 +373,7 @@ def generate_itempool(world, player: int):
 
     if world.goal[player] == 'icerodhunt':
         for item in dungeon_items:
-            world.itempool.append(ItemFactory('Nothing', player))
+            world.itempool.append(ItemFactory(GetBeemizerItem(world, player, 'Nothing'), player))
             world.push_precollected(item)
     else:
         for item in dungeon_items:
@@ -407,7 +407,7 @@ def generate_itempool(world, player: int):
             else:
                 nonprogressionitems.append(item)
         else:
-            nonprogressionitems.append(item)
+            nonprogressionitems.append(GetBeemizerItem(world, item.player, item))
     world.random.shuffle(nonprogressionitems)
 
     if additional_triforce_pieces:
@@ -424,10 +424,10 @@ def generate_itempool(world, player: int):
         mm_medallion = world.random.choice(['Ether', 'Quake', 'Bombos'])
     else:
         mm_medallion = world.required_medallions[player][0]
-    if world.required_medallions[player][0] == "random":
+    if world.required_medallions[player][1] == "random":
         tr_medallion = world.random.choice(['Ether', 'Quake', 'Bombos'])
     else:
-        tr_medallion = world.required_medallions[player][0]
+        tr_medallion = world.required_medallions[player][1]
     world.required_medallions[player] = (mm_medallion, tr_medallion)
 
     place_bosses(world, player)
