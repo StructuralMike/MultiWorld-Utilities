@@ -7,7 +7,7 @@ from Bosses import place_bosses
 from Dungeons import get_dungeon_item_pool
 from EntranceShuffle import connect_entrance
 from Fill import FillError, fill_restrictive
-from Items import ItemFactory, GetBeemizerItem
+from Items import ItemFactory, GetBeemizerItem, trap_replaceable
 from Rules import forbid_items_for_player
 
 # This file sets the item pools for various modes. Timed modes and triforce hunt are enforced first, and then extra items are specified per mode to fill in the remaining space.
