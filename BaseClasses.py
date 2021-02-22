@@ -621,9 +621,9 @@ class CollectionState(object):
 
     def has(self, item, player: int, count: int = 1):
         if self.world.futuro[player]:
-            if self.prog_items['Magic Upgrade (1/2)', player] == 0 and self.prog_items['Magic Upgrade (1/4)', player] == 0:
-                magic_items = ['Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Cane of Somaria', 'Cane of Byrna', 'Cape']
-                if item in magic_items:
+            magic_items = ['Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Cane of Somaria', 'Cane of Byrna', 'Cape']
+            if item in magic_items:
+                if self.prog_items['Magic Upgrade (1/2)', player] == 0 and self.prog_items['Magic Upgrade (1/4)', player] == 0:
                     return False
         return self.prog_items[item, player] >= count
 
@@ -727,10 +727,7 @@ class CollectionState(object):
                 or self.can_bomb_walls(player))
 
     def can_bomb_walls(self, player: int) -> bool:
-        if self.world.futuro[player]:
-            return self.has('Bomb Upgrade (+10)', player)
-        else:
-            return True
+        return not self.world.futuro[player] or self.has('Bomb Upgrade (+10)', player)
 
     def can_shoot_arrows(self, player: int) -> bool:
         if self.world.retro[player]:
@@ -774,7 +771,7 @@ class CollectionState(object):
         return self.has('Moon Pearl', player)
 
     def has_fire_source(self, player: int) -> bool:
-        return self.has('Fire Rod', player) or self.has('Lamp', player)
+        return self.has('Fire Rod', player) or (self.has('Lamp', player) and (self.has('Magic Upgrade (1/2)', player) or self.has('Magic Upgrade (1/4)', player)))
 
     def can_melt_things(self, player: int) -> bool:
         return (self.has('Fire Rod', player) or \

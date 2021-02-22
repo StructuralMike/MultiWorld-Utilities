@@ -947,15 +947,15 @@ def patch_rom(world, rom, player, team, enemized):
         # Powder cost
         rom.write_bytes(0x3B076, [0x81, 0x08, 0x04])
         # Unknown
-        rom.write_bytes(0x3B079, [0x08, 0x04, 0x02])
+#        rom.write_bytes(0x3B079, [0x81, 0x08, 0x04])
         # Somaria cost
         rom.write_bytes(0x3B07C, [0x81, 0x08, 0x04])
         # Unknown
-        rom.write_bytes(0x3B07F, [0x10, 0x08, 0x04])
+#        rom.write_bytes(0x3B07F, [0x81, 0x10, 0x08])
         # Lamp cost
         rom.write_bytes(0x3B082, [0x81, 0x04, 0x02])
         # Unknown
-        rom.write_bytes(0x3B085, [0x08, 0x04, 0x02])
+#        rom.write_bytes(0x3B085, [0x81, 0x08, 0x04])
         # Byrna activation cost
         rom.write_bytes(0x3B088, [0x81, 0x10, 0x08])
 
@@ -963,6 +963,9 @@ def patch_rom(world, rom, player, team, enemized):
         rom.write_bytes(0x3ADA7, [0x01, 0x04, 0x08])
         # Byrna residual magic cost
         rom.write_bytes(0x45C42, [0x81, 0x04, 0x02])
+
+        # StartingMaxBombs
+        rom.write_int16(0x180034, 1)
 
     # Set overflow items for progressive equipment
     rom.write_bytes(0x180090,
@@ -1020,6 +1023,14 @@ def patch_rom(world, rom, player, team, enemized):
                                   0xE2: 0xDB}  # 10 Arrows -> Red Rupee
             prizes = [prize_replacements.get(prize, prize) for prize in prizes]
             dig_prizes = [prize_replacements.get(prize, prize) for prize in dig_prizes]
+
+        if world.futuro[player]:
+            prize_replacements = {0xDC: 0xDA,  # 1 Bomb -> Green Rupee
+                                  0xDD: 0xDB,  # 4 Bombs  -> Blue Rupee
+                                  0xDE: 0xDB}  # 8 Bombs  -> Red Rupee
+            prizes = [prize_replacements.get(prize, prize) for prize in prizes]
+            dig_prizes = [prize_replacements.get(prize, prize) for prize in dig_prizes]
+
         rom.write_bytes(0x180100, dig_prizes)
 
         # write tree pull prizes
@@ -1055,6 +1066,13 @@ def patch_rom(world, rom, player, team, enemized):
                           0x4D397, 0x4D39E, 0x4D3AB, 0x4D3AE, 0x4D3D1, 0x4D3D7,
                           0x4D3F8, 0x4D416, 0x4D420, 0x4D423, 0x4D42D, 0x4D449, 0x4D48C, 0x4D4D9, 0x4D4DC, 0x4D4E3,
                           0x4D504, 0x4D507, 0x4D55E, 0x4D56A]
+
+        if world.futuro[player]:
+            prize_replacements = {0xDC: 0xD8,  # 1 Bomb -> Single Heart
+                                  0xDD: 0xDB,  # 4 Bombs  -> Blue Rupee
+                                  0xDE: 0xE3}  # 8 Bombs  -> Fairy
+            bonk_prizes = [prize_replacements.get(prize, prize) for prize in bonk_prizes]
+
         local_random.shuffle(bonk_prizes)
         for prize, address in zip(bonk_prizes, bonk_addresses):
             rom.write_byte(address, prize)
@@ -1173,8 +1191,13 @@ def patch_rom(world, rom, player, team, enemized):
                    0x01 if world.ganon_at_pyramid[player] else 0x00)  # Enable respawning on pyramid after ganon death
     rom.write_byte(0x180173, 0x01)  # Bob is enabled
     rom.write_byte(0x180168, 0x08)  # Spike Cave Damage
-    rom.write_bytes(0x18016B, [0x04, 0x02, 0x01])  # Set spike cave and MM spike room Cape usage
-    rom.write_bytes(0x18016E, [0x04, 0x08, 0x10])  # Set spike cave and MM spike room Cape usage
+    if world.futuro[player]:
+        rom.write_bytes(0x18016B, [0x81, 0x04, 0x02])  # Set spike cave and MM spike room Cape usage
+        rom.write_bytes(0x18016E, [0x01, 0x04, 0x08])  # Set spike cave and MM spike room Cape usage
+    else:
+        rom.write_bytes(0x18016B, [0x04, 0x02, 0x01])  # Set spike cave and MM spike room Cape usage
+        rom.write_bytes(0x18016E, [0x04, 0x08, 0x10])  # Set spike cave and MM spike room Cape usage
+
     rom.write_bytes(0x50563, [0x3F, 0x14])  # disable below ganon chest
     rom.write_byte(0x50599, 0x00)  # disable below ganon chest
     rom.write_bytes(0xE9A5, [0x7E, 0x00, 0x24])  # disable below ganon chest
@@ -1194,7 +1217,11 @@ def patch_rom(world, rom, player, team, enemized):
     equip[0x36C] = 0x18
     equip[0x36D] = 0x18
     equip[0x379] = 0x68
-    starting_max_bombs = 10
+    if world.futuro[player]:
+        starting_max_bombs = 1
+    else:
+        starting_max_bombs = 10
+
     starting_max_arrows = 30
 
     startingstate = CollectionState(world)

@@ -721,6 +721,8 @@ def get_pool_core(world, player: int):
     if futuro:
         magic_count = 0
         bomb_count = 0
+        replace = {'Bomb (1)', 'Bombs (3)', 'Bombs (10)'}
+        pool = ['Rupees (5)' if item in replace else item for item in pool]
         for item in pool:
             if item == 'Magic Upgrade (1/2)':
                 magic_count += 1
@@ -729,8 +731,6 @@ def get_pool_core(world, player: int):
         if 'Magic Upgrade (1/4)' not in pool and magic_count < 2:
             pool.append('Magic Upgrade (1/2)')
         if bomb_count == 0:
-            pool.extend(['Bomb Upgrade (+10)']*2)
-        elif bomb_count == 1 :
             pool.append('Bomb Upgrade (+10)')
 
 

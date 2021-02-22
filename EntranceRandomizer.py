@@ -276,7 +276,7 @@ def parse_arguments(argv, no_defaults=False):
                              and a few other little things make this more like Zelda-1.
                              ''', action='store_true')
     parser.add_argument('--futuro', default=defval(False), help='''\
-                             You start with bomb capacity 1, and magic capacity 0,
+                             You start with bomb capacity 1, and the inability to use magic,
                              find the bomb and magic upgrades to logically progress.
                              ''', action='store_true')
     parser.add_argument('--startinventory', default=defval(''),

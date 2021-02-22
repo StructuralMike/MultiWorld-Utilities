@@ -363,8 +363,10 @@ def shuffle_shops(world, items, player: int):
         progressive = world.progressive[player]
         progressive = world.random.choice([True, False]) if progressive == 'random' else progressive == 'on'
         progressive &= world.goal == 'icerodhunt'
-        new_items = ["Bomb Upgrade (+5)"] * 6
-        new_items.append("Bomb Upgrade (+5)" if progressive else "Bomb Upgrade (+10)")
+        new_items = []
+        if not world.futuro[player]:
+            new_items += ["Bomb Upgrade (+5)"] * 6
+            new_items.append("Bomb Upgrade (+5)" if progressive else "Bomb Upgrade (+10)")
 
         if not world.retro[player]:
             new_items += ["Arrow Upgrade (+5)"] * 6
