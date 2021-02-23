@@ -285,7 +285,8 @@ def global_rules(world, player):
         forbid_item(world.get_location('Swamp Palace - Entrance', player), 'Big Key (Swamp Palace)', player)
 
     set_rule(world.get_entrance('Thieves Town Big Key Door', player), lambda state: state.has('Big Key (Thieves Town)', player))
-    set_rule(world.get_entrance('Blind Fight', player), lambda state: state.has_key('Small Key (Thieves Town)', player))
+    tt_boss = world.get_location('Thieves\' Town - Boss', player)
+    set_rule(world.get_entrance('Blind Fight', player), lambda state: state.has_key('Small Key (Thieves Town)', player) and (state.can_bomb_walls(player) or tt_boss.parent_region.dungeon.boss == 'Blind'))
     set_defeat_dungeon_boss_rule(world.get_location('Thieves\' Town - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Thieves\' Town - Prize', player))
     set_rule(world.get_location('Thieves\' Town - Big Chest', player), lambda state: (state.has_key('Small Key (Thieves Town)', player) or item_name(state, 'Thieves\' Town - Big Chest', player) == ('Small Key (Thieves Town)', player)) and state.has('Hammer', player))
@@ -450,26 +451,13 @@ def default_rules(world, player):
     set_rule(world.get_location('Sewers - Secret Room - Right', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
     set_rule(world.get_location('Paradox Cave Upper - Left', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Paradox Cave Upper - Right', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_location('Paradox Cave Lower - Far Left', player), lambda state: \
-            state.can_bomb_walls(player) or state.can_shoot_arrows(player) or state.has_beam_sword(player) \
-            or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player) \
-            or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
-    set_rule(world.get_location('Paradox Cave Lower - Left', player), lambda state: \
-            state.can_bomb_walls(player) or state.can_shoot_arrows(player) or state.has_beam_sword(player) \
-            or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player) \
-            or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
-    set_rule(world.get_location('Paradox Cave Lower - Right', player), lambda state: \
-            state.can_bomb_walls(player) or state.can_shoot_arrows(player) or state.has_beam_sword(player) \
-            or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player) \
-            or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
-    set_rule(world.get_location('Paradox Cave Lower - Far Right', player), lambda state: \
-            state.can_bomb_walls(player) or state.can_shoot_arrows(player) or state.has_beam_sword(player) \
-            or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player) \
-            or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
-    set_rule(world.get_location('Paradox Cave Lower - Middle', player), lambda state: \
-            state.can_bomb_walls(player) or state.can_shoot_arrows(player) or state.has_beam_sword(player) \
-            or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player) \
-            or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
+
+    paradox_switch_chests = ['Paradox Cave Lower - Far Left', 'Paradox Cave Lower - Left', 'Paradox Cave Lower - Right', 'Paradox Cave Lower - Far Right', 'Paradox Cave Lower - Middle']
+    for location in paradox_switch_chests:
+        set_rule(world.get_location(location, player), lambda state: \
+                state.can_bomb_walls(player) or state.can_shoot_arrows(player) or state.has_beam_sword(player) \
+                or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player) \
+                or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
 
     set_rule(world.get_location('Hype Cave - Top', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Hype Cave - Middle Right', player), lambda state: state.can_bomb_walls(player))
@@ -483,13 +471,15 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Light World Death Mountain Shop', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_entrance('Hookshot Cave Exit (North)', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_entrance('Turtle Rock Ledge Exit (West)', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_location('Mini Moldorm Cave - Far Left', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_location('Mini Moldorm Cave - Far Right', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_location('Mini Moldorm Cave - Left', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_location('Mini Moldorm Cave - Right', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_location('Mini Moldorm Cave - Generous Guy', player), lambda state: state.can_bomb_walls(player))
+    set_rule(world.get_entrance('Mini Moldorm Cave', player), lambda state: state.can_bomb_walls(player))
+    set_rule(world.get_location('Mini Moldorm Cave - Far Left', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_location('Mini Moldorm Cave - Far Right', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_location('Mini Moldorm Cave - Left', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_location('Mini Moldorm Cave - Right', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_location('Mini Moldorm Cave - Generous Guy', player), lambda state: state.can_kill_most_things(player))
 
     set_rule(world.get_entrance('Two Brothers House Exit (West)', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
+    set_rule(world.get_entrance('Two Brothers House Exit (East)', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
 
     # overworld requirements
     set_rule(world.get_entrance('Kings Grave', player), lambda state: state.has_Boots(player))
@@ -881,9 +871,9 @@ def add_conditional_lamps(world, player):
 def open_rules(world, player):
     # softlock protection as you can reach the sewers small key door with a guard drop key
     set_rule(world.get_location('Hyrule Castle - Boomerang Chest', player),
-             lambda state: state.has_key('Small Key (Hyrule Castle)', player))
+             lambda state: state.has_key('Small Key (Hyrule Castle)', player) and state.can_kill_most_things(player))
     set_rule(world.get_location('Hyrule Castle - Zelda\'s Chest', player),
-             lambda state: state.has_key('Small Key (Hyrule Castle)', player))
+             lambda state: state.has_key('Small Key (Hyrule Castle)', player) and state.can_kill_most_things(player))
 
 
 def swordless_rules(world, player):
