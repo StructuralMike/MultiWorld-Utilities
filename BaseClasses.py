@@ -622,8 +622,7 @@ class CollectionState(object):
     def has(self, item, player: int, count: int = 1):
         if self.world.futuro[player]:
             magic_items = ['Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Cane of Somaria', 'Cane of Byrna', 'Cape']
-            if item in magic_items:
-                if self.prog_items['Magic Upgrade (1/2)', player] == 0 and self.prog_items['Magic Upgrade (1/4)', player] == 0:
+            if item in magic_items and self.prog_items['Magic Upgrade (1/2)', player] == 0 and self.prog_items['Magic Upgrade (1/4)', player] == 0:
                     return False
         return self.prog_items[item, player] >= count
 
@@ -694,20 +693,17 @@ class CollectionState(object):
 
     def can_extend_magic(self, player: int, smallmagic: int = 16,
                          fullrefill: bool = False):  # This reflects the total magic Link has, not the total extra he has.
-        if self.world.futuro[player]:
-            if self.has('Magic Upgrade (1/4)', player):
-                basemagic = 16
-            elif self.has('Magic Upgrade (1/2)', player):
-                basemagic = 8
-            else:
-                basemagic = 0
+        if self.has('Magic Upgrade (1/4)', player):
+            basemagic = 32
+        elif self.has('Magic Upgrade (1/2)', player):
+            basemagic = 16
         else:
-            if self.has('Magic Upgrade (1/4)', player):
-                basemagic = 32
-            elif self.has('Magic Upgrade (1/2)', player):
-                basemagic = 16
-            else:
+            basemagic = 8
+        if self.world.futuro[player]:
+            if basemagic == 8:
                 basemagic = 0
+            else:
+                basemagic = int(basemagic/2)
         if self.can_buy_unlimited('Green Potion', player) or self.can_buy_unlimited('Blue Potion', player):
             if self.world.difficulty_adjustments[player] == 'hard' and not fullrefill:
                 basemagic = basemagic + int(basemagic * 0.5 * self.bottle_count(player))
@@ -719,10 +715,10 @@ class CollectionState(object):
 
     def can_kill_most_things(self, player: int, enemies=5) -> bool:
         return (self.has_melee_weapon(player)
-                or (self.has('Cane of Somaria', player))
+                or self.has('Cane of Somaria', player)
                 or (self.has('Cane of Byrna', player) and (enemies < 6 or self.can_extend_magic(player)))
                 or self.can_shoot_arrows(player)
-                or (self.has('Fire Rod', player))
+                or self.has('Fire Rod', player)
                 or (self.has('Bombs (10)', player) and enemies < 6 and self.can_bomb_walls(player))
                 or self.can_bomb_walls(player))
 
@@ -774,13 +770,13 @@ class CollectionState(object):
         return self.has('Fire Rod', player) or (self.has('Lamp', player) and (self.has('Magic Upgrade (1/2)', player) or self.has('Magic Upgrade (1/4)', player)))
 
     def can_melt_things(self, player: int) -> bool:
-        return (self.has('Fire Rod', player) or \
+        return self.has('Fire Rod', player) or \
                (self.has('Bombos', player) and
                 (self.world.swords[player] == "swordless" or
-                 self.has_sword(player))))
+                 self.has_sword(player)))
 
     def can_avoid_lasers(self, player: int) -> bool:
-        return self.has('Mirror Shield', player) or (self.has('Cane of Byrna', player) or self.has('Cape', player))
+        return self.has('Mirror Shield', player) or self.has('Cane of Byrna', player) or self.has('Cape', player)
 
     def is_not_bunny(self, region: Region, player: int) -> bool:
         if self.has_Pearl(player):
