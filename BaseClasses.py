@@ -86,9 +86,6 @@ class World(object):
         for player in range(1, players + 1):
             def set_player_attr(attr, val):
                 self.__dict__.setdefault(attr, {})[player] = val
-            # If World State is Futuro, set Futuro flag
-            if self.mode[player] == "futuro":
-                self.futuro[player] = True
             set_player_attr('_region_cache', {})
             set_player_attr('player_names', [])
             set_player_attr('remote_items', False)
