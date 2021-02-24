@@ -995,9 +995,9 @@ def patch_rom(world, rom, player, team, enemized):
         prize_replacements[0xE2] = 0xDB  # 10 Arrows -> Red Rupee
 
     if world.futuro[player]:
-        prize_replacements = {0xDC: 0xD8,  # 1 Bomb -> Single Heart
-                                0xDD: 0xDB,  # 4 Bombs  -> Blue Rupee
-                                0xDE: 0xE3}  # 8 Bombs  -> Fairy
+        prize_replacements[0xDC] = 0xD8  # 1 Bomb -> Single Heart
+        prize_replacements[0xDD] = 0xDB  # 4 Bombs  -> Blue Rupee
+        prize_replacements[0xDE] = 0xE3  # 8 Bombs  -> Fairy
 
     if "g" in world.shuffle_prizes[player]:
         # shuffle prize packs
@@ -1069,7 +1069,6 @@ def patch_rom(world, rom, player, team, enemized):
                         0x4D397, 0x4D39E, 0x4D3AB, 0x4D3AE, 0x4D3D1, 0x4D3D7,
                         0x4D3F8, 0x4D416, 0x4D420, 0x4D423, 0x4D42D, 0x4D449, 0x4D48C, 0x4D4D9, 0x4D4DC, 0x4D4E3,
                         0x4D504, 0x4D507, 0x4D55E, 0x4D56A]
-
     if "b" in world.shuffle_prizes[player]:
         # set bonk prizes
         bonk_prizes = [0x79, 0xE3, 0x79, 0xAC, 0xAC, 0xE0, 0xDC, 0xAC, 0xE3, 0xE3, 0xDA, 0xE3, 0xDA, 0xD8, 0xAC,

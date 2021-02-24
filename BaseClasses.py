@@ -733,6 +733,18 @@ class CollectionState(object):
     def can_bomb_walls(self, player: int) -> bool:
         return not self.world.futuro[player] or self.has('Bomb Upgrade (+10)', player)
 
+    def can_hit_switch(self, player: int) -> bool:
+        return (self.can_bomb_walls(player)
+                or self.can_shoot_arrows(player)
+                or self.has_melee_weapon(player)
+                or self.has('Blue Boomerang', player)
+                or self.has('Red Boomerang', player)
+                or self.has('Hookshot', player)
+                or self.has('Fire Rod', player)
+                or self.has('Ice Rod', player)
+                or self.has('Cane of Somaria', player)
+                or self.has('Cane of Byrna', player))
+
     def can_shoot_arrows(self, player: int) -> bool:
         if self.world.retro[player]:
             return (self.has('Bow', player) or self.has('Silver Bow', player)) and self.can_buy('Single Arrow', player)
