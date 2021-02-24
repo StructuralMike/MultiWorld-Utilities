@@ -216,8 +216,7 @@ def global_rules(world, player):
     set_rule(world.get_location('Spike Cave', player), lambda state:
              state.has('Hammer', player) and state.can_lift_rocks(player) and
              ((state.has('Cape', player) and state.can_extend_magic(player, 16, True)) or
-              (state.has('Cane of Byrna', player) and
-               (state.can_extend_magic(player, 12, True) or
+              (state.has('Cane of Byrna', player) and (state.can_extend_magic(player, 12, True) or
                 (state.world.can_take_damage[player] and (state.has_Boots(player) or state.has_hearts(player, 4))))))
              )
 
@@ -416,9 +415,9 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Ganons Tower Torch Rooms', player),
              lambda state: state.has_fire_source(player) and state.world.get_entrance('Ganons Tower Torch Rooms', player).parent_region.dungeon.bosses['middle'].can_defeat(state))
     set_rule(world.get_location('Ganons Tower - Pre-Moldorm Chest', player),
-             lambda state: state.has_key('Small Key (Ganons Tower)', player, 3))
+             lambda state: state.has_key('Small Key (Ganons Tower)', player, 3) and state.can_bomb_walls(player))
     set_rule(world.get_entrance('Ganons Tower Moldorm Door', player),
-             lambda state: state.has_key('Small Key (Ganons Tower)', player, 4))
+             lambda state: state.has_key('Small Key (Ganons Tower)', player, 4) and state.can_bomb_walls(player))
     set_rule(world.get_entrance('Ganons Tower Moldorm Gap', player),
              lambda state: state.has('Hookshot', player) and state.world.get_entrance('Ganons Tower Moldorm Gap', player).parent_region.dungeon.bosses['top'].can_defeat(state))
     set_defeat_dungeon_boss_rule(world.get_location('Agahnim 2', player))
@@ -437,18 +436,23 @@ def global_rules(world, player):
 
 def default_rules(world, player):
     """Default world rules when world state is not inverted."""
-    # bomb requirements only
+    # bomb are boots requirements
+    set_rule(world.get_location("Sahasrahla's Hut - Left", player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
+    set_rule(world.get_location("Sahasrahla's Hut - Middle", player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
+    set_rule(world.get_location("Sahasrahla's Hut - Right", player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
+    set_rule(world.get_location('Sewers - Secret Room - Left', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
+    set_rule(world.get_location('Sewers - Secret Room - Middle', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
+    set_rule(world.get_location('Sewers - Secret Room - Right', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
+
+    set_rule(world.get_entrance('Two Brothers House Exit (West)', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
+    set_rule(world.get_entrance('Two Brothers House Exit (East)', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
+
+    # bombs are boots requirements
     set_rule(world.get_location("Blind's Hideout - Top", player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location("Kakariko Well - Top", player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Chicken House', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location("Aginah's Cave", player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_location("Sahasrahla's Hut - Left", player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
-    set_rule(world.get_location("Sahasrahla's Hut - Middle", player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
-    set_rule(world.get_location("Sahasrahla's Hut - Right", player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
     set_rule(world.get_location('Graveyard Cave', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_location('Sewers - Secret Room - Left', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
-    set_rule(world.get_location('Sewers - Secret Room - Middle', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
-    set_rule(world.get_location('Sewers - Secret Room - Right', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
     set_rule(world.get_location('Paradox Cave Upper - Left', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Paradox Cave Upper - Right', player), lambda state: state.can_bomb_walls(player))
 
@@ -464,22 +468,20 @@ def default_rules(world, player):
     set_rule(world.get_location('Hype Cave - Middle Left', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Hype Cave - Bottom', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Swamp Palace - Map Chest', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_location('Ganons Tower - Pre-Moldorm Chest', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_entrance('Ganons Tower Moldorm Door', player), lambda state: state.can_bomb_walls(player))
+
     set_rule(world.get_entrance('Ice Rod Cave', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_entrance('Light World Bomb Hut', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_entrance('Light World Death Mountain Shop', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_entrance('Hookshot Cave Exit (North)', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_entrance('Turtle Rock Ledge Exit (West)', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_entrance('Mini Moldorm Cave', player), lambda state: state.can_bomb_walls(player))
+
     set_rule(world.get_location('Mini Moldorm Cave - Far Left', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_location('Mini Moldorm Cave - Far Right', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_location('Mini Moldorm Cave - Left', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_location('Mini Moldorm Cave - Right', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_location('Mini Moldorm Cave - Generous Guy', player), lambda state: state.can_kill_most_things(player))
 
-    set_rule(world.get_entrance('Two Brothers House Exit (West)', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
-    set_rule(world.get_entrance('Two Brothers House Exit (East)', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
 
     # overworld requirements
     set_rule(world.get_entrance('Kings Grave', player), lambda state: state.has_Boots(player))
