@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '9e27514e0655659f1d07364c35da7852'
+RANDOMIZERBASEHASH = 'a0a9511a2a59e5e8009b38718f8da1bf'
 
 import io
 import json
@@ -674,6 +674,14 @@ class Sprite(object):
         rom.write_bytes(0x307000, self.palette)
         rom.write_bytes(0x307078, self.glove_palette)
 
+bonk_addresses = [0x4CF6C, 0x4CFBA, 0x4CFE0, 0x4CFFB, 0x4D018, 0x4D01B, 0x4D028, 0x4D03C, 0x4D059, 0x4D07A,
+                  0x4D09E, 0x4D0A8, 0x4D0AB, 0x4D0AE, 0x4D0BE, 0x4D0DD,
+                  0x4D16A, 0x4D1E5, 0x4D1EE, 0x4D20B, 0x4CBBF, 0x4CBBF, 0x4CC17, 0x4CC1A, 0x4CC4A, 0x4CC4D,
+                  0x4CC53, 0x4CC69, 0x4CC6F, 0x4CC7C, 0x4CCEF, 0x4CD51,
+                  0x4CDC0, 0x4CDC3, 0x4CDC6, 0x4CE37, 0x4D2DE, 0x4D32F, 0x4D355, 0x4D367, 0x4D384, 0x4D387,
+                  0x4D397, 0x4D39E, 0x4D3AB, 0x4D3AE, 0x4D3D1, 0x4D3D7,
+                  0x4D3F8, 0x4D416, 0x4D420, 0x4D423, 0x4D42D, 0x4D449, 0x4D48C, 0x4D4D9, 0x4D4DC, 0x4D4E3,
+                  0x4D504, 0x4D507, 0x4D55E, 0x4D56A]
 
 def patch_rom(world, rom, player, team, enemized):
     local_random = world.rom_seeds[player]
@@ -868,8 +876,8 @@ def patch_rom(world, rom, player, team, enemized):
 
     rom.write_byte(0x18004F, 0x01)  # Byrna Invulnerability: on
 
-    # handle difficulty_adjustments
-    if world.difficulty_adjustments[player] == 'hard':
+    # handle item_functionality
+    if world.item_functionality[player] == 'hard':
         rom.write_byte(0x180181, 0x01)  # Make silver arrows work only on ganon
         rom.write_byte(0x180182, 0x00)  # Don't auto equip silvers on pickup
         # Powdered Fairies Prize
@@ -889,7 +897,7 @@ def patch_rom(world, rom, player, team, enemized):
         rom.write_int16(0x180036, world.rupoor_cost)
         # Set stun items
         rom.write_byte(0x180180, 0x02)  # Hookshot only
-    elif world.difficulty_adjustments[player] == 'expert':
+    elif world.item_functionality[player] == 'expert':
         rom.write_byte(0x180181, 0x01)  # Make silver arrows work only on ganon
         rom.write_byte(0x180182, 0x00)  # Don't auto equip silvers on pickup
         # Powdered Fairies Prize
@@ -986,6 +994,15 @@ def patch_rom(world, rom, player, team, enemized):
 
     # set up game internal RNG seed
     rom.write_bytes(0x178000, local_random.getrandbits(8 * 1024).to_bytes(1024, 'big'))
+    prize_replacements = {}
+    if world.item_functionality[player] in ['hard', 'expert']:
+        prize_replacements[0xE0] = 0xDF  # Fairy -> heart
+        prize_replacements[0xE3] = 0xD8  # Big magic -> small magic
+
+    if world.retro[player]:
+        prize_replacements[0xE1] = 0xDA  # 5 Arrows -> Blue Rupee
+        prize_replacements[0xE2] = 0xDB  # 10 Arrows -> Red Rupee
+
     if "g" in world.shuffle_prizes[player]:
         # shuffle prize packs
         prizes = [0xD8, 0xD8, 0xD8, 0xD8, 0xD9, 0xD8, 0xD8, 0xD9, 0xDA, 0xD9, 0xDA, 0xDB, 0xDA, 0xD9, 0xDA, 0xDA, 0xE0,
@@ -1011,10 +1028,7 @@ def patch_rom(world, rom, player, team, enemized):
         packs = chunk(prizes[:56], 8)
         local_random.shuffle(packs)
         prizes[:56] = [drop for pack in packs for drop in pack]
-
-        if world.difficulty_adjustments[player] in ['hard', 'expert']:
-            prize_replacements = {0xE0: 0xDF,  # Fairy -> heart
-                                  0xE3: 0xD8}  # Big magic -> small magic
+        if prize_replacements:
             prizes = [prize_replacements.get(prize, prize) for prize in prizes]
             dig_prizes = [prize_replacements.get(prize, prize) for prize in dig_prizes]
 
@@ -1051,6 +1065,19 @@ def patch_rom(world, rom, player, team, enemized):
         # fill enemy prize packs
         rom.write_bytes(0x37A78, prizes)
 
+    elif prize_replacements:
+        dig_prizes = list(rom.read_bytes(0x180100, 64))
+        dig_prizes = [prize_replacements.get(byte, byte) for byte in dig_prizes]
+        rom.write_bytes(0x180100, dig_prizes)
+
+        prizes = list(rom.read_bytes(0x37A78, 56))
+        prizes = [prize_replacements.get(byte, byte) for byte in prizes]
+        rom.write_bytes(0x37A78, prizes)
+
+        for address in (0xEFBD4, 0xEFBD5, 0xEFBD6, 0x329C8, 0x329C4, 0x37993, 0xE82CC):
+            byte = int(rom.read_byte(address))
+            rom.write_byte(address, prize_replacements.get(byte, byte))
+
     if "b" in world.shuffle_prizes[player]:
         # set bonk prizes
         bonk_prizes = [0x79, 0xE3, 0x79, 0xAC, 0xAC, 0xE0, 0xDC, 0xAC, 0xE3, 0xE3, 0xDA, 0xE3, 0xDA, 0xD8, 0xAC,
@@ -1074,8 +1101,18 @@ def patch_rom(world, rom, player, team, enemized):
             bonk_prizes = [prize_replacements.get(prize, prize) for prize in bonk_prizes]
 
         local_random.shuffle(bonk_prizes)
+
+        if prize_replacements:
+            bonk_prizes = [prize_replacements.get(prize, prize) for prize in bonk_prizes]
+
         for prize, address in zip(bonk_prizes, bonk_addresses):
             rom.write_byte(address, prize)
+
+    elif prize_replacements:
+        for address in bonk_addresses:
+            byte = int(rom.read_byte(address))
+            rom.write_byte(address, prize_replacements.get(byte, byte))
+
 
     # Fill in item substitutions table
     rom.write_bytes(0x184000, [
@@ -1135,7 +1172,7 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_byte(0x180043, 0xFF if world.swords[player] == 'swordless' else 0x00)  # starting sword for link
     rom.write_byte(0x180044, 0x01 if world.swords[player] == 'swordless' else 0x00)  # hammer activates tablets
 
-    if world.difficulty_adjustments[player] == 'easy':
+    if world.item_functionality[player] == 'easy':
         rom.write_byte(0x18003F, 0x01)  # hammer can harm ganon
         rom.write_byte(0x180041, 0x02)  # Allow swordless medallion use EVERYWHERE.
         rom.write_byte(0x180044, 0x01)  # hammer activates tablets
@@ -1323,7 +1360,9 @@ def patch_rom(world, rom, player, team, enemized):
                     'Big Key (Ganons Tower)': (0x366, 0x04), 'Compass (Ganons Tower)': (0x364, 0x04),
                     'Map (Ganons Tower)': (0x368, 0x04)}
         set_or_table = {'Flippers': (0x356, 1, 0x379, 0x02), 'Pegasus Boots': (0x355, 1, 0x379, 0x04),
-                        'Shovel': (0x34C, 1, 0x38C, 0x04), 'Flute': (0x34C, 3, 0x38C, 0x01),
+                        'Shovel': (0x34C, 1, 0x38C, 0x04),
+                        'Flute': (0x34C, 2, 0x38C, 0x02),
+                        'Activated Flute': (0x34C, 3, 0x38C, 0x01),
                         'Mushroom': (0x344, 1, 0x38C, 0x20 | 0x08), 'Magic Powder': (0x344, 2, 0x38C, 0x10),
                         'Blue Boomerang': (0x341, 1, 0x38C, 0x80), 'Red Boomerang': (0x341, 2, 0x38C, 0x40)}
         keys = {'Small Key (Eastern Palace)': [0x37E], 'Small Key (Desert Palace)': [0x37F],
@@ -1725,23 +1764,18 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
 
     # Reduce flashing by nopping out instructions
     if reduceflashing:
-        rom.write_bytes(0xEE651, [0xEA]*3) # nop out any flash triggers (storing to 0x0FF9)
-        rom.write_bytes(0xED315, [0xEA]*3) # includes aga lightning, mad batter (untested), vitreous (untested)
-        rom.write_bytes(0x2FBE0, [0xEA]*3) 
-        rom.write_bytes(0x67535, [0xEA]*3) 
-
-        rom.write_bytes(0x42ACB, [0xEA]*3) # nop out ether palette trigger ; lda 0 always beqs
-        rom.write_bytes(0x123FE, [0x72]) # set lightning flash in misery mire (and standard?) to brightness 0x72
-        rom.write_byte(0x30817F, 0x01) # rom accessibility option
+        rom.write_bytes(0x17E07, [0x06]) # reduce amount of colors changed, add this branch if we need to reduce more  ""+ [0x80] + [(0x81-0x08)]""
+        rom.write_bytes(0x17EAB, [0xD0, 0x03, 0xA9, 0x40, 0x29, 0x60]) # nullifies aga lightning, cutscene, vitreous, bat, ether
+        # ONLY write to black values with this low pale blue to indicate flashing, that's IT.  ""BNE + : LDA #$2940 : + : RTS""
+        rom.write_bytes(0x123FE, [0x72]) # set lightning flash in misery mire (and standard) to brightness 0x72
+        rom.write_bytes(0x3FA7B, [0x80, 0xac-0x7b]) # branch from palette writing lightning on death mountain
+        rom.write_byte(0x10817F, 0x01) # internal rom option
     else:
-        rom.write_bytes(0xEE651, [0x8D, 0xF9, 0x0F])  
-        rom.write_bytes(0xED315, [0x8D, 0xF9, 0x0F])  
-        rom.write_bytes(0x2FBE0, [0x8D, 0xF9, 0x0F]) 
-        rom.write_bytes(0x67535, [0x8E, 0xF9, 0x0F]) 
-
-        rom.write_bytes(0x42ACB, [0xBD, 0x54, 0x0C]) 
-        rom.write_bytes(0x123FE, [0x32])
-        rom.write_byte(0x30817F, 0x00)
+        rom.write_bytes(0x17E07, [0x00]) 
+        rom.write_bytes(0x17EAB, [0x85, 0x00, 0x29, 0x1F, 0x00, 0x18])
+        rom.write_bytes(0x123FE, [0x32]) # original weather flash value
+        rom.write_bytes(0x3FA7B, [0xc2, 0x20]) # rep #$20
+        rom.write_byte(0x10817F, 0x00) # internal rom option
 
     # Wall and Watergate cutscenes
     if cutscenespeed == "fast":
@@ -2102,6 +2136,15 @@ def write_strings(rom, world, player, team):
 
     # For hints, first we write hints about entrances, some from the inconvenient list others from all reasonable entrances.
     if world.hints[player]:
+        # Zora hint
+        zora_location = world.get_location("King Zora", player)
+        tt['zora_tells_cost'] = f"You got 500 rupees to buy {hint_text(zora_location.item)}" \
+                                f"\n  ≥ Duh\n    Oh carp\n{{CHOICE}}"
+        # Bottle Vendor hint
+        vendor_location = world.get_location("Bottle Merchant", player)
+        tt['bottle_vendor_choice'] = f"I gots {hint_text(vendor_location.item)}\nYous gots 100 rupees?"\
+                                     f"\n  ≥ I want\n    no way!\n{{CHOICE}}"
+
         tt['sign_north_of_links_house'] = '> Randomizer The telepathic tiles can have hints!'
         hint_locations = HintLocations.copy()
         local_random.shuffle(hint_locations)
@@ -2134,7 +2177,7 @@ def write_strings(rom, world, player, team):
             hint_count = 4
         for entrance in all_entrances:
             if entrance.name in entrances_to_hint:
-                if hint_count > 0:
+                if hint_count:
                     this_hint = entrances_to_hint[entrance.name] + ' leads to ' + hint_text(
                         entrance.connected_region) + '.'
                     tt[hint_locations.pop(0)] = this_hint
@@ -2171,7 +2214,7 @@ def write_strings(rom, world, player, team):
         hint_count = 4 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 0
         for entrance in all_entrances:
             if entrance.name in entrances_to_hint:
-                if hint_count > 0:
+                if hint_count:
                     this_hint = entrances_to_hint[entrance.name] + ' leads to ' + hint_text(
                         entrance.connected_region) + '.'
                     tt[hint_locations.pop(0)] = this_hint
@@ -2186,10 +2229,9 @@ def write_strings(rom, world, player, team):
             locations_to_hint.extend(InconvenientVanillaLocations)
         local_random.shuffle(locations_to_hint)
         hint_count = 3 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 5
-        del locations_to_hint[hint_count:]
-        for location in locations_to_hint:
+        for location in locations_to_hint[:hint_count]:
             if location == 'Swamp Left':
-                if local_random.randint(0, 1) == 0:
+                if local_random.randint(0, 1):
                     first_item = hint_text(world.get_location('Swamp Palace - West Chest', player).item)
                     second_item = hint_text(world.get_location('Swamp Palace - Big Key Chest', player).item)
                 else:
@@ -2198,7 +2240,7 @@ def write_strings(rom, world, player, team):
                 this_hint = ('The westmost chests in Swamp Palace contain ' + first_item + ' and ' + second_item + '.')
                 tt[hint_locations.pop(0)] = this_hint
             elif location == 'Mire Left':
-                if local_random.randint(0, 1) == 0:
+                if local_random.randint(0, 1):
                     first_item = hint_text(world.get_location('Misery Mire - Compass Chest', player).item)
                     second_item = hint_text(world.get_location('Misery Mire - Big Key Chest', player).item)
                 else:
@@ -2258,8 +2300,8 @@ def write_strings(rom, world, player, team):
         # All remaining hint slots are filled with junk hints. It is done this way to ensure the same junk hint isn't selected twice.
         junk_hints = junk_texts.copy()
         local_random.shuffle(junk_hints)
-        for location in hint_locations:
-            tt[location] = junk_hints.pop(0)
+        for location, text in zip(hint_locations, junk_hints):
+            tt[location] = text
 
     # We still need the older hints of course. Those are done here.
 

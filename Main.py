@@ -21,6 +21,7 @@ from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
 from Fill import distribute_items_restrictive, flood_items, balance_multiworld_progression, distribute_planned
 from ItemPool import generate_itempool, difficulties, fill_prizes
 from Utils import output_path, parse_player_names, get_options, __version__, _version_tuple
+from typing import Dict
 import Patch
 
 seeddigits = 20
@@ -31,6 +32,14 @@ def get_seed(seed=None):
         random.seed(None)
         return random.randint(0, pow(10, seeddigits) - 1)
     return seed
+
+
+seeds: Dict[tuple, str] = dict()
+def get_same_seed(world: World, seed_def: tuple) -> str:
+    if seed_def in seeds:
+        return seeds[seed_def]
+    seeds[seed_def] = str(world.random.randint(0, 2 ** 64))
+    return seeds[seed_def]
 
 
 def main(args, seed=None):
@@ -92,11 +101,23 @@ def main(args, seed=None):
     world.plando_items = args.plando_items.copy()
     world.plando_texts = args.plando_texts.copy()
     world.plando_connections = args.plando_connections.copy()
+    world.er_seeds = args.er_seeds.copy()
     world.restrict_dungeon_item_on_boss = args.restrict_dungeon_item_on_boss.copy()
     world.required_medallions = args.required_medallions.copy()
     world.startinventory = args.startinventory.copy()
 
     world.rom_seeds = {player: random.Random(world.random.randint(0, 999999999)) for player in range(1, world.players + 1)}
+
+    for player in range(1, world.players+1):
+        world.er_seeds[player] = str(world.random.randint(0, 2 ** 64))
+
+        if "-" in world.shuffle[player]:
+            shuffle, seed = world.shuffle[player].split("-", 1)
+            world.shuffle[player] = shuffle
+            if seed.startswith("team-"):
+                world.er_seeds[player] = get_same_seed(world, (shuffle, seed, world.retro[player], world.mode[player], world.logic[player]))
+            else:
+                world.er_seeds[player] = seed
 
     logger.info('ALttP Berserker\'s Multiworld Version %s  -  Seed: %s\n', __version__, world.seed)
 
@@ -167,12 +188,18 @@ def main(args, seed=None):
                 {"vanilla", "dungeonssimple", "dungeonsfull", "simple", "restricted", "full"}:
             world.fix_fake_world[player] = False
 
+        # seeded entrance shuffle
+        old_random = world.random
+        world.random = random.Random(world.er_seeds[player])
+
         if world.mode[player] != 'inverted':
             link_entrances(world, player)
             mark_light_world_regions(world, player)
         else:
             link_inverted_entrances(world, player)
             mark_dark_world_regions(world, player)
+
+        world.random = old_random
         plando_connect(world, player)
 
     logger.info('Generating Item Pool.')
@@ -213,12 +240,12 @@ def main(args, seed=None):
     elif args.algorithm == 'balanced':
         distribute_items_restrictive(world, True)
 
-    if world.players > 1:
-        balance_multiworld_progression(world)
-
     logger.info("Filling Shop Slots")
 
     ShopSlotFill(world)
+
+    if world.players > 1:
+        balance_multiworld_progression(world)
 
     logger.info('Patching ROM.')
 
@@ -256,9 +283,7 @@ def main(args, seed=None):
         
         apply_rom_settings(rom, args.heartbeep[player], args.heartcolor[player], args.quickswap[player],
                            args.fastmenu[player], args.disablemusic[player], args.sprite[player],
-                           palettes_options, world, player, True,
-                           cutscenespeed=args.cutscenespeed[player] if not args.race else "normal",
-                           reduceflashing=args.reduceflashing[player])
+                           palettes_options, world, player, True, cutscenespeed=args.cutscenespeed[player] if not args.race else "normal", reduceflashing=args.reduceflashing[player] if not args.race else True)
 
         mcsb_name = ''
         if all([world.mapshuffle[player], world.compassshuffle[player], world.keyshuffle[player],
@@ -284,7 +309,7 @@ def main(args, seed=None):
         outfilestuffs = {
           "logic": world.logic[player],                                    # 0
           "difficulty": world.difficulty[player],                          # 1
-          "difficulty_adjustments": world.difficulty_adjustments[player],  # 2
+          "item_functionality": world.item_functionality[player],          # 2
           "mode": world.mode[player],                                      # 3
           "goal": world.goal[player],                                      # 4
           "timer": str(world.timer[player]),                               # 5
@@ -306,7 +331,7 @@ def main(args, seed=None):
           outfilestuffs["logic"], # 0
 
           outfilestuffs["difficulty"],              # 1
-          outfilestuffs["difficulty_adjustments"],  # 2
+          outfilestuffs["item_functionality"],      # 2
           outfilestuffs["mode"],                    # 3
           outfilestuffs["goal"],                    # 4
           "" if outfilestuffs["timer"] in ['False', 'none', 'display'] else "-" + outfilestuffs["timer"], # 5
@@ -606,11 +631,11 @@ def create_playthrough(world):
     while sphere_candidates:
         state.sweep_for_events(key_only=True)
 
-        sphere = []
+        sphere = set()
         # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
         for location in sphere_candidates:
             if state.can_reach(location):
-                sphere.append(location)
+                sphere.add(location)
 
         for location in sphere:
             sphere_candidates.remove(location)
@@ -634,25 +659,24 @@ def create_playthrough(world):
                 break
 
     # in the second phase, we cull each sphere such that the game is still beatable, reducing each range of influence to the bare minimum required inside it
-    for num, sphere in reversed(list(enumerate(collection_spheres))):
-        to_delete = []
+    for num, sphere in reversed(tuple(enumerate(collection_spheres))):
+        to_delete = set()
         for location in sphere:
             # we remove the item at location and check if game is still beatable
             logging.getLogger('').debug('Checking if %s (Player %d) is required to beat the game.', location.item.name, location.item.player)
             old_item = location.item
             location.item = None
             if world.can_beat_game(state_cache[num]):
-                to_delete.append(location)
+                to_delete.add(location)
             else:
                 # still required, got to keep it around
                 location.item = old_item
 
         # cull entries in spheres for spoiler walkthrough at end
-        for location in to_delete:
-            sphere.remove(location)
+        sphere -= to_delete
 
     # second phase, sphere 0
-    for item in [i for i in world.precollected_items if i.advancement]:
+    for item in (i for i in world.precollected_items if i.advancement):
         logging.getLogger('').debug('Checking if %s (Player %d) is required to beat the game.', item.name, item.player)
         world.precollected_items.remove(item)
         world.state.remove(item)
@@ -665,13 +689,13 @@ def create_playthrough(world):
     # used to access it was deemed not required.) So we need to do one final sphere collection pass
     # to build up the correct spheres
 
-    required_locations = [item for sphere in collection_spheres for item in sphere]
+    required_locations = {item for sphere in collection_spheres for item in sphere}
     state = CollectionState(world)
     collection_spheres = []
     while required_locations:
         state.sweep_for_events(key_only=True)
 
-        sphere = list(filter(state.can_reach, required_locations))
+        sphere = set(filter(state.can_reach, required_locations))
 
         for location in sphere:
             required_locations.remove(location)
@@ -682,9 +706,6 @@ def create_playthrough(world):
         logging.getLogger('').debug('Calculated final sphere %i, containing %i of %i progress items.', len(collection_spheres), len(sphere), len(required_locations))
         if not sphere:
             raise RuntimeError('Not all required items reachable. Something went terribly wrong here.')
-
-    # store the required locations for statistical analysis
-    old_world.required_locations = [(location.name, location.player) for sphere in collection_spheres for location in sphere]
 
     def flist_to_iter(node):
         while node:
@@ -702,7 +723,7 @@ def create_playthrough(world):
     old_world.spoiler.paths = dict()
     for player in range(1, world.players + 1):
         old_world.spoiler.paths.update({ str(location) : get_path(state, location.parent_region) for sphere in collection_spheres for location in sphere if location.player == player})
-        for _, path in dict(old_world.spoiler.paths).items():
+        for path in dict(old_world.spoiler.paths).values():
             if any(exit == 'Pyramid Fairy' for (_, exit) in path):
                 if world.mode[player] != 'inverted':
                     old_world.spoiler.paths[str(world.get_region('Big Bomb Shop', player))] = get_path(state, world.get_region('Big Bomb Shop', player))
@@ -710,6 +731,7 @@ def create_playthrough(world):
                     old_world.spoiler.paths[str(world.get_region('Inverted Big Bomb Shop', player))] = get_path(state, world.get_region('Inverted Big Bomb Shop', player))
 
     # we can finally output our playthrough
-    old_world.spoiler.playthrough = OrderedDict([("0", [str(item) for item in world.precollected_items if item.advancement])])
+    old_world.spoiler.playthrough = {"0": sorted([str(item) for item in world.precollected_items if item.advancement])}
+
     for i, sphere in enumerate(collection_spheres):
-        old_world.spoiler.playthrough[str(i + 1)] = {str(location): str(location.item) for location in sphere}
+        old_world.spoiler.playthrough[str(i + 1)] = {str(location): str(location.item) for location in sorted(sphere)}
