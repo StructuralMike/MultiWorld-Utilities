@@ -288,15 +288,13 @@ def global_rules(world, player):
         forbid_item(world.get_location('Swamp Palace - Entrance', player), 'Big Key (Swamp Palace)', player)
 
     set_rule(world.get_entrance('Thieves Town Big Key Door', player), lambda state: state.has('Big Key (Thieves Town)', player))
-    tt_boss = world.get_location('Thieves\' Town - Boss', player)
-    set_rule(world.get_entrance('Blind Fight', player), lambda state: state.has_key('Small Key (Thieves Town)', player) and (state.can_bomb_walls(player) or tt_boss.parent_region.dungeon.boss != 'Blind'))
+    set_rule(world.get_entrance('Blind Fight', player), lambda state: state.has_key('Small Key (Thieves Town)', player) and state.can_bomb_walls(player))
     set_defeat_dungeon_boss_rule(world.get_location('Thieves\' Town - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Thieves\' Town - Prize', player))
-    set_rule(world.get_location('Thieves\' Town - Blind\'s Cell', player), lambda state: state.can_hit_switch(player))
     set_rule(world.get_location('Thieves\' Town - Big Chest', player), lambda state: (state.has_key('Small Key (Thieves Town)', player) or item_name(state, 'Thieves\' Town - Big Chest', player) == ('Small Key (Thieves Town)', player)) and state.has('Hammer', player))
     if world.accessibility[player] != 'locations':
         set_always_allow(world.get_location('Thieves\' Town - Big Chest', player), lambda state, item: item.name == 'Small Key (Thieves Town)' and item.player == player and state.has('Hammer', player))
-    set_rule(world.get_location('Thieves\' Town - Attic', player), lambda state: state.can_hit_switch(player) and state.has_key('Small Key (Thieves Town)', player))
+    set_rule(world.get_location('Thieves\' Town - Attic', player), lambda state: state.has_key('Small Key (Thieves Town)', player))
 
     set_rule(world.get_entrance('Skull Woods First Section South Door', player), lambda state: state.has_key('Small Key (Skull Woods)', player))
     set_rule(world.get_entrance('Skull Woods First Section (Right) North Door', player), lambda state: state.has_key('Small Key (Skull Woods)', player))
@@ -392,7 +390,7 @@ def global_rules(world, player):
     # It is possible to need more than 3 keys ....
     set_rule(world.get_entrance('Ganons Tower (Firesnake Room)', player),
                             lambda state: state.has_key('Small Key (Ganons Tower)', player, 3)
-                            and (state.can_bomb_walls(player) or state.has("Blue Boomerang") or state.has("Red Boomerang") or state.has("Cane of Somaria")))
+                            and (state.can_bomb_walls(player) or state.has("Blue Boomerang", player) or state.has("Red Boomerang", player) or state.has("Cane of Somaria", player)))
 
     #The actual requirements for these rooms to avoid key-lock
     randomizer_room_chests = ['Ganons Tower - Randomizer Room - Top Left', 'Ganons Tower - Randomizer Room - Top Right', 'Ganons Tower - Randomizer Room - Bottom Left', 'Ganons Tower - Randomizer Room - Bottom Right']
