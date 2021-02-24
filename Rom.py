@@ -949,8 +949,8 @@ def patch_rom(world, rom, player, team, enemized):
 #        rom.write_bytes(0x3B079, [0x81, 0x08, 0x04])
         # Somaria cost
         rom.write_bytes(0x3B07C, [0x81, 0x08, 0x04])
-        # Unknown
-#        rom.write_bytes(0x3B07F, [0x81, 0x10, 0x08])
+        # Unknown - maybe small magic refill
+        rom.write_bytes(0x3B07F, [0x81, 0x10, 0x08])
         # Lamp cost
         rom.write_bytes(0x3B082, [0x81, 0x04, 0x02])
         # Unknown
