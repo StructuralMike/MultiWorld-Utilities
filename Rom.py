@@ -1007,9 +1007,9 @@ def patch_rom(world, rom, player, team, enemized):
         prize_replacements[0xE2] = 0xDB  # 10 Arrows -> Red Rupee
 
     if world.futuro[player]:
-        prize_replacements[0xDC] = 0xD8  # 1 Bomb -> Single Heart
+        prize_replacements[0xDC] = 0xDA  # 1 Bomb -> Small Magic
         prize_replacements[0xDD] = 0xDF  # 4 Bombs  -> Small Magic
-        prize_replacements[0xDE] = 0xE3  # 8 Bombs  -> Fairy
+#        prize_replacements[0xDE] = 0xE3  # 8 Bombs  -> Fairy
 
     if "g" in world.shuffle_prizes[player]:
         # shuffle prize packs
@@ -1104,6 +1104,7 @@ def patch_rom(world, rom, player, team, enemized):
         0x58, 0x01, 0x36 if world.retro[player] else 0x43, 0xFF,  # silver arrows -> single arrow (red 20 in retro mode)
         0x3E, difficulty.boss_heart_container_limit, 0x28 if world.futuro[player] else 0x47, 0xff,  # boss heart -> green 20 or Bombs (3) if Futuro
         0x17, difficulty.heart_piece_limit, 0x28 if world.futuro[player] else 0x47, 0xff,  # piece of heart -> green 20 or Bombs (3) if Futuro
+        0x31, 0x00, 0x41 if world.futuro[player] else 0x31, 0xff,  # Bombs (10) -> Rupees (50) in futuro
         0xFF, 0xFF, 0xFF, 0xFF,  # end of table sentinel
     ])
 
@@ -1522,7 +1523,8 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_int16(0x18017C, get_reveal_bytes('Crystal 5') | get_reveal_bytes('Crystal 6') if world.mapshuffle[
         player] else 0x0000)  # Bomb Shop Reveal
 
-    rom.write_byte(0x301F8, 0xDF if world.futuro[player] else 0xDA)  # small magic replace bombs under pots
+    rom.write_byte(0x301F8, 0xDF if world.futuro[player] else 0xDC)  # small magic replace bombs under rocks and bushes outdoors
+    rom.write_byte(0x301FD, 0xDF if world.futuro[player] else 0xDC)  # small magic replace bombs under pots indoors
     rom.write_byte(0x180172, 0x01 if world.keyshuffle[player] == "universal" else 0x00)  # universal keys
     rom.write_byte(0x18637E, 0x01 if world.retro[player] else 0x00)  # Skip quiver in item shops once bought
     rom.write_byte(0x180175, 0x01 if world.retro[player] else 0x00)  # rupee bow
@@ -1580,9 +1582,7 @@ def patch_rom(world, rom, player, team, enemized):
 
     # powder patch: remove the need to leave the screen after powder, since it causes problems for potion shop at race game
     # temporarally we are just nopping out this check we will conver this to a rom fix soon.
-    rom.write_bytes(0x02F539,
-                    [0xEA, 0xEA, 0xEA, 0xEA, 0xEA] if world.powder_patch_required[player] else [0xAD, 0xBF, 0x0A, 0xF0,
-                                                                                                0x4F])
+    rom.write_bytes(0x02F539,[0xEA, 0xEA, 0xEA, 0xEA, 0xEA] if world.powder_patch_required[player] else [0xAD, 0xBF, 0x0A, 0xF0, 0x4F])
 
     # allow smith into multi-entrance caves in appropriate shuffles
     if world.shuffle[player] in ['restricted', 'full', 'crossed', 'insanity'] or (

@@ -732,6 +732,9 @@ def get_pool_core(world, player: int):
             pool.append('Magic Upgrade (1/2)')
         if bomb_count == 0:
             pool.append('Bomb Upgrade (+10)')
+            pool.append('Bomb Upgrade (+10)')
+        if bomb_count == 1:
+            pool.append('Bomb Upgrade (+10)')
 
 
     # Remove starting inventory items from the item pool and replace it with 20 rupees, if suitable and possible.
