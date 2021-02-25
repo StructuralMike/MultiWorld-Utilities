@@ -674,6 +674,15 @@ class Sprite(object):
         rom.write_bytes(0x307000, self.palette)
         rom.write_bytes(0x307078, self.glove_palette)
 
+bonk_addresses = [0x4CF6C, 0x4CFBA, 0x4CFE0, 0x4CFFB, 0x4D018, 0x4D01B, 0x4D028, 0x4D03C, 0x4D059, 0x4D07A,
+                    0x4D09E, 0x4D0A8, 0x4D0AB, 0x4D0AE, 0x4D0BE, 0x4D0DD,
+                    0x4D16A, 0x4D1E5, 0x4D1EE, 0x4D20B, 0x4CBBF, 0x4CBBF, 0x4CC17, 0x4CC1A, 0x4CC4A, 0x4CC4D,
+                    0x4CC53, 0x4CC69, 0x4CC6F, 0x4CC7C, 0x4CCEF, 0x4CD51,
+                    0x4CDC0, 0x4CDC3, 0x4CDC6, 0x4CE37, 0x4D2DE, 0x4D32F, 0x4D355, 0x4D367, 0x4D384, 0x4D387,
+                    0x4D397, 0x4D39E, 0x4D3AB, 0x4D3AE, 0x4D3D1, 0x4D3D7,
+                    0x4D3F8, 0x4D416, 0x4D420, 0x4D423, 0x4D42D, 0x4D449, 0x4D48C, 0x4D4D9, 0x4D4DC, 0x4D4E3,
+                    0x4D504, 0x4D507, 0x4D55E, 0x4D56A]
+
 def patch_rom(world, rom, player, team, enemized):
     local_random = world.rom_seeds[player]
 
@@ -949,8 +958,8 @@ def patch_rom(world, rom, player, team, enemized):
 #        rom.write_bytes(0x3B079, [0x81, 0x08, 0x04])
         # Somaria cost
         rom.write_bytes(0x3B07C, [0x81, 0x08, 0x04])
-        # Unknown - maybe small magic refill
-        rom.write_bytes(0x3B07F, [0x81, 0x10, 0x08])
+        # Unknown
+#        rom.write_bytes(0x3B07F, [0x81, 0x10, 0x08])
         # Lamp cost
         rom.write_bytes(0x3B082, [0x81, 0x04, 0x02])
         # Unknown
@@ -965,6 +974,9 @@ def patch_rom(world, rom, player, team, enemized):
 
         # StartingMaxBombs
         rom.write_int16(0x180034, 1)
+
+        # Powdered fairies give 8 bombs
+        rom.write_byte(0x36DD0, 0xDE)
 
     # Set overflow items for progressive equipment
     rom.write_bytes(0x180090,
@@ -987,8 +999,8 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_bytes(0x178000, local_random.getrandbits(8 * 1024).to_bytes(1024, 'big'))
     prize_replacements = {}
     if world.item_functionality[player] in ['hard', 'expert']:
-        prize_replacements[0xE0] = 0xDF  # Fairy -> heart
-        prize_replacements[0xE3] = 0xD8  # Big magic -> small magic
+        prize_replacements[0xE0] = 0xDF  # Big magic -> small magic
+        prize_replacements[0xE3] = 0xD8  # Fairy -> heart
 
     if world.retro[player]:
         prize_replacements[0xE1] = 0xDA  # 5 Arrows -> Blue Rupee
@@ -996,7 +1008,7 @@ def patch_rom(world, rom, player, team, enemized):
 
     if world.futuro[player]:
         prize_replacements[0xDC] = 0xD8  # 1 Bomb -> Single Heart
-        prize_replacements[0xDD] = 0xDB  # 4 Bombs  -> Blue Rupee
+        prize_replacements[0xDD] = 0xDF  # 4 Bombs  -> Small Magic
         prize_replacements[0xDE] = 0xE3  # 8 Bombs  -> Fairy
 
     if "g" in world.shuffle_prizes[player]:
@@ -1061,14 +1073,6 @@ def patch_rom(world, rom, player, team, enemized):
             byte = int(rom.read_byte(address))
             rom.write_byte(address, prize_replacements.get(byte, byte))
 
-    bonk_addresses = [0x4CF6C, 0x4CFBA, 0x4CFE0, 0x4CFFB, 0x4D018, 0x4D01B, 0x4D028, 0x4D03C, 0x4D059, 0x4D07A,
-                        0x4D09E, 0x4D0A8, 0x4D0AB, 0x4D0AE, 0x4D0BE, 0x4D0DD,
-                        0x4D16A, 0x4D1E5, 0x4D1EE, 0x4D20B, 0x4CBBF, 0x4CBBF, 0x4CC17, 0x4CC1A, 0x4CC4A, 0x4CC4D,
-                        0x4CC53, 0x4CC69, 0x4CC6F, 0x4CC7C, 0x4CCEF, 0x4CD51,
-                        0x4CDC0, 0x4CDC3, 0x4CDC6, 0x4CE37, 0x4D2DE, 0x4D32F, 0x4D355, 0x4D367, 0x4D384, 0x4D387,
-                        0x4D397, 0x4D39E, 0x4D3AB, 0x4D3AE, 0x4D3D1, 0x4D3D7,
-                        0x4D3F8, 0x4D416, 0x4D420, 0x4D423, 0x4D42D, 0x4D449, 0x4D48C, 0x4D4D9, 0x4D4DC, 0x4D4E3,
-                        0x4D504, 0x4D507, 0x4D55E, 0x4D56A]
     if "b" in world.shuffle_prizes[player]:
         # set bonk prizes
         bonk_prizes = [0x79, 0xE3, 0x79, 0xAC, 0xAC, 0xE0, 0xDC, 0xAC, 0xE3, 0xE3, 0xDA, 0xE3, 0xDA, 0xD8, 0xAC,
@@ -1095,11 +1099,11 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_bytes(0x184000, [
         # original_item, limit, replacement_item, filler
         0x12, 0x01, 0x35, 0xFF,  # lamp -> 5 rupees
-        0x51, 0x06, 0x52, 0xFF,  # 6 +10 bomb upgrades -> +5 bomb upgrade
+        0x51, 0x00 if world.futuro[player] else 0x06, 0x31 if world.futuro[player] else 0x52, 0xFF,  # 6 +5 bomb upgrades -> +10 bomb upgrade. If futuro: 0 upgrades -> Bombs (10)
         0x53, 0x06, 0x54, 0xFF,  # 6 +5 arrow upgrades -> +10 arrow upgrade
         0x58, 0x01, 0x36 if world.retro[player] else 0x43, 0xFF,  # silver arrows -> single arrow (red 20 in retro mode)
-        0x3E, difficulty.boss_heart_container_limit, 0x47, 0xff,  # boss heart -> green 20
-        0x17, difficulty.heart_piece_limit, 0x47, 0xff,  # piece of heart -> green 20
+        0x3E, difficulty.boss_heart_container_limit, 0x28 if world.futuro[player] else 0x47, 0xff,  # boss heart -> green 20 or Bombs (3) if Futuro
+        0x17, difficulty.heart_piece_limit, 0x28 if world.futuro[player] else 0x47, 0xff,  # piece of heart -> green 20 or Bombs (3) if Futuro
         0xFF, 0xFF, 0xFF, 0xFF,  # end of table sentinel
     ])
 
@@ -1518,6 +1522,7 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_int16(0x18017C, get_reveal_bytes('Crystal 5') | get_reveal_bytes('Crystal 6') if world.mapshuffle[
         player] else 0x0000)  # Bomb Shop Reveal
 
+    rom.write_byte(0x301F8, 0xDF if world.futuro[player] else 0xDA)  # small magic replace bombs under pots
     rom.write_byte(0x180172, 0x01 if world.keyshuffle[player] == "universal" else 0x00)  # universal keys
     rom.write_byte(0x18637E, 0x01 if world.retro[player] else 0x00)  # Skip quiver in item shops once bought
     rom.write_byte(0x180175, 0x01 if world.retro[player] else 0x00)  # rupee bow
