@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'a0a9511a2a59e5e8009b38718f8da1bf'
+RANDOMIZERBASEHASH = '8d823cc1d54fd9e99eceec49c7450087'
+#RANDOMIZERBASEHASH = 'a0a9511a2a59e5e8009b38718f8da1bf'
 
 import io
 import json
@@ -972,9 +973,6 @@ def patch_rom(world, rom, player, team, enemized):
         # Byrna residual magic cost
         rom.write_bytes(0x45C42, [0x81, 0x04, 0x02])
 
-        # StartingMaxBombs
-        rom.write_int16(0x180034, 1)
-
         # Powdered fairies give 8 bombs
         rom.write_byte(0x36DD0, 0xDE)
 
@@ -1005,11 +1003,6 @@ def patch_rom(world, rom, player, team, enemized):
     if world.retro[player]:
         prize_replacements[0xE1] = 0xDA  # 5 Arrows -> Blue Rupee
         prize_replacements[0xE2] = 0xDB  # 10 Arrows -> Red Rupee
-
-    if world.futuro[player]:
-        prize_replacements[0xDC] = 0xDA  # 1 Bomb -> Small Magic
-        prize_replacements[0xDD] = 0xDF  # 4 Bombs  -> Small Magic
-#        prize_replacements[0xDE] = 0xE3  # 8 Bombs  -> Fairy
 
     if "g" in world.shuffle_prizes[player]:
         # shuffle prize packs
@@ -1099,12 +1092,11 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_bytes(0x184000, [
         # original_item, limit, replacement_item, filler
         0x12, 0x01, 0x35, 0xFF,  # lamp -> 5 rupees
-        0x51, 0x00 if world.futuro[player] else 0x06, 0x31 if world.futuro[player] else 0x52, 0xFF,  # 6 +5 bomb upgrades -> +10 bomb upgrade. If futuro: 0 upgrades -> Bombs (10)
+        0x51, 0x00 if world.futuro[player] else 0x06, 0x31 if world.futuro[player] else 0x52, 0xFF,  # 6 +5 bomb upgrades -> +10 bomb upgrade. If futuro, turns inteo Bombs (10)
         0x53, 0x06, 0x54, 0xFF,  # 6 +5 arrow upgrades -> +10 arrow upgrade
         0x58, 0x01, 0x36 if world.retro[player] else 0x43, 0xFF,  # silver arrows -> single arrow (red 20 in retro mode)
-        0x3E, difficulty.boss_heart_container_limit, 0x28 if world.futuro[player] else 0x47, 0xff,  # boss heart -> green 20 or Bombs (3) if Futuro
-        0x17, difficulty.heart_piece_limit, 0x28 if world.futuro[player] else 0x47, 0xff,  # piece of heart -> green 20 or Bombs (3) if Futuro
-        0x31, 0x00, 0x41 if world.futuro[player] else 0x31, 0xff,  # Bombs (10) -> Rupees (50) in futuro
+        0x3E, difficulty.boss_heart_container_limit, 0x47, 0xff,  # boss heart -> green 20
+        0x17, difficulty.heart_piece_limit, 0x47, 0xff,  # piece of heart -> green 20
         0xFF, 0xFF, 0xFF, 0xFF,  # end of table sentinel
     ])
 
@@ -1211,10 +1203,10 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_byte(0x180173, 0x01)  # Bob is enabled
     rom.write_byte(0x180168, 0x08)  # Spike Cave Damage
     if world.futuro[player]:
-        rom.write_bytes(0x18016B, [0x81, 0x04, 0x02])  # Set spike cave and MM spike room Cape usage
+        rom.write_bytes(0x18016B, [0x81, 0x04, 0x02])  # Set spike cave and MM spike room Byrna usage
         rom.write_bytes(0x18016E, [0x01, 0x04, 0x08])  # Set spike cave and MM spike room Cape usage
     else:
-        rom.write_bytes(0x18016B, [0x04, 0x02, 0x01])  # Set spike cave and MM spike room Cape usage
+        rom.write_bytes(0x18016B, [0x04, 0x02, 0x01])  # Set spike cave and MM spike room Byrna usage
         rom.write_bytes(0x18016E, [0x04, 0x08, 0x10])  # Set spike cave and MM spike room Cape usage
 
     rom.write_bytes(0x50563, [0x3F, 0x14])  # disable below ganon chest
@@ -1237,7 +1229,7 @@ def patch_rom(world, rom, player, team, enemized):
     equip[0x36D] = 0x18
     equip[0x379] = 0x68
     if world.futuro[player]:
-        starting_max_bombs = 1
+        starting_max_bombs = 0
     else:
         starting_max_bombs = 10
 
@@ -1523,8 +1515,6 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_int16(0x18017C, get_reveal_bytes('Crystal 5') | get_reveal_bytes('Crystal 6') if world.mapshuffle[
         player] else 0x0000)  # Bomb Shop Reveal
 
-    rom.write_byte(0x301F8, 0xDF if world.futuro[player] else 0xDC)  # small magic replace bombs under rocks and bushes outdoors
-    rom.write_byte(0x301FD, 0xDF if world.futuro[player] else 0xDC)  # small magic replace bombs under pots indoors
     rom.write_byte(0x180172, 0x01 if world.keyshuffle[player] == "universal" else 0x00)  # universal keys
     rom.write_byte(0x18637E, 0x01 if world.retro[player] else 0x00)  # Skip quiver in item shops once bought
     rom.write_byte(0x180175, 0x01 if world.retro[player] else 0x00)  # rupee bow
