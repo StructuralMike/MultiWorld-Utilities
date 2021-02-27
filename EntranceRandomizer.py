@@ -276,9 +276,9 @@ def parse_arguments(argv, no_defaults=False):
                              Keys are universal, shooting arrows costs rupees,
                              and a few other little things make this more like Zelda-1.
                              ''', action='store_true')
-    parser.add_argument('--futuro', default=defval(False), help='''\
-                             You start with bomb capacity 1, and the inability to use magic,
-                             find the bomb and magic upgrades to logically progress.
+    parser.add_argument('--futuro', default=defval('none'), help='''\
+                             Start with bomb capacity 0 and/or the inability to use magic.
+                             Find the bomb and/or magic upgrades to logically progress.
                              ''', action='store_true')
     parser.add_argument('--startinventory', default=defval(''),
                         help='Specifies a list of items that will be in your starting inventory (separated by commas)')

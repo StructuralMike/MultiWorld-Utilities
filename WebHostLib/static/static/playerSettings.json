@@ -219,6 +219,30 @@
         }
       ]
     },
+    "futuro": {
+      "type": "select",
+      "friendlyName": "Futuro Settings",
+      "description": "Choose if you want to play turn off starting bombs and/or magic",
+      "defaultValue": "none",
+      "options": [
+        {
+          "name": "None",
+          "value": "none"
+        },
+        {
+          "name": "Bombs",
+          "value": "b"
+        },
+        {
+          "name": "Magic",
+          "value": "m"
+        },
+        {
+          "name": "Bombs and Magic",
+          "value": "bm"
+        }
+      ]
+    },
     "hints": {
       "type": "select",
       "friendlyName": "Hints",

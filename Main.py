@@ -342,8 +342,8 @@ def main(args, seed=None):
 
           "-retro" if outfilestuffs["retro"] == "True" else "",  # 9
           "-prog_" + outfilestuffs["progressive"] if outfilestuffs["progressive"] in ['off', 'random'] else "",  # A
-          "-nohints" if not outfilestuffs["hints"] == "True" else ""),  # B
-          "-futuro" if outfilestuffs["futuro"] == "True" else "" # C
+          "-nohints" if not outfilestuffs["hints"] == "True" else "",  # B
+          "-futuro_" + outfilestuffs["futuro"] if outfilestuffs["futuro"] in ['b','m','bm','mb'] else "") # C
         ) if not args.outputname else ''
         rompath = output_path(f'{outfilebase}{outfilepname}{outfilesuffix}.sfc')
         rom.write_to_file(rompath, hide_enemizer=True)

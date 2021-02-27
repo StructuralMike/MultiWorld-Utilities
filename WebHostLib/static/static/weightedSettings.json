@@ -768,6 +768,38 @@
         }
       }
     },
+    "futuro": {
+      "keyString": "futuro",
+      "friendlyName": "Futoro Settings",
+      "description": "Similarly to how Ocarina of Time works, you can chose to start without the ability to carry bombs, and/or without the ability to use magic. Find your bomb upgrades and/or your magic upgrade.",
+      "inputType": "range",
+      "subOptions": {
+        "none": {
+          "keyString": "futuro.none",
+          "friendlyName": "None",
+          "description": "Disable",
+          "defaultValue": 50
+        },
+        "b": {
+          "keyString": "futuro.b",
+          "friendlyName": "Bombs ",
+          "description": "No bombs",
+          "defaultValue": 0
+        },
+        "m": {
+          "keyString": "futuro.m",
+          "friendlyName": "Magic",
+          "description": "No magic",
+          "defaultValue": 0
+        },
+        "bm": {
+          "keyString": "futuro.bm",
+          "friendlyName": "Bombs and Magic",
+          "description": "No bombs, no magic",
+          "defaultValue": 0
+        }
+      }
+    },
     "hints": {
       "keyString": "hints",
       "friendlyName": "Hint Type",

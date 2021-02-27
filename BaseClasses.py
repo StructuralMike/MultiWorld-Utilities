@@ -704,7 +704,7 @@ class CollectionState(object):
             basemagic = 16
         else:
             basemagic = 8
-        if self.world.futuro[player]:
+        if 'm' in self.world.futuro[player]:
             if basemagic == 8:
                 basemagic = 0
             else:
@@ -728,7 +728,7 @@ class CollectionState(object):
                 or self.can_bomb_walls(player))
 
     def can_bomb_walls(self, player: int) -> bool:
-        return not self.world.futuro[player] or self.has('Bomb Upgrade (+10)', player)
+        return ('b' not in self.world.futuro[player] or self.has('Bomb Upgrade (+10)', player) or self.has('Bomb Upgrade (+5)', player, 2))
 
     def can_hit_switch(self, player: int) -> bool:
         return (self.can_bomb_walls(player)
@@ -1421,8 +1421,7 @@ class Spoiler(object):
                 outfile.write('Mode:                            %s\n' % self.metadata['mode'][player])
                 outfile.write('Retro:                           %s\n' %
                               ('Yes' if self.metadata['retro'][player] else 'No'))
-                outfile.write('Futuro:                           %s\n' %
-                              ('Yes' if self.metadata['futuro'][player] else 'No'))
+                outfile.write('Futuro:                          %s\n' % self.metadata["futuro"][player])
                 outfile.write('Swords:                          %s\n' % self.metadata['weapons'][player])
                 outfile.write('Goal:                            %s\n' % self.metadata['goal'][player])
                 if "triforce" in self.metadata["goal"][player]:  # triforce hunt
