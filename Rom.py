@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '384593eebeb941c49f2194f23f523117'
+RANDOMIZERBASEHASH = '5d1dab7232f6bc4d8a57da311209dde0'
 #RANDOMIZERBASEHASH = 'a0a9511a2a59e5e8009b38718f8da1bf'
 
 import io
@@ -1396,6 +1396,11 @@ def patch_rom(world, rom, player, team, enemized):
                 equip[0x36D] = min(equip[0x36D] + 0x08, 0xA0)
         else:
             raise RuntimeError(f'Unsupported item in starting equipment: {item.name}')
+
+    if 'b' in world.futuro[player]:
+        rom.write_byte(0x18008D, 0x00)
+    if 'm' in world.futuro[player]:
+        rom.write_byte(0x18008E, 0x00)
 
     equip[0x343] = min(equip[0x343], starting_max_bombs)
     rom.write_byte(0x180034, starting_max_bombs)
