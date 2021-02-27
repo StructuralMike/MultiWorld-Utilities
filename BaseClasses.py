@@ -537,6 +537,7 @@ class World(object):
 
         return False
 
+magic_items = ['Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Cane of Somaria', 'Cane of Byrna', 'Cape']
 
 class CollectionState(object):
 
@@ -626,7 +627,6 @@ class CollectionState(object):
 
     def has(self, item, player: int, count: int = 1):
         if 'm' in self.world.futuro[player]:
-            magic_items = ['Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Cane of Somaria', 'Cane of Byrna', 'Cape']
             if item in magic_items and self.prog_items['Magic Upgrade (1/2)', player] == 0 and self.prog_items['Magic Upgrade (1/4)', player] == 0:
                 return False
         return self.prog_items[item, player] >= count
