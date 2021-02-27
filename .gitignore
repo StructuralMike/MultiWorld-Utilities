@@ -5,7 +5,7 @@
 *.bmbp
 *.pyc
 *.pyd
-*.sfc
+Z*.sfc
 *.wixobj
 *.lck
 *multidata
