@@ -718,23 +718,23 @@ def get_pool_core(world, player: int):
         else:
             pool.extend([item_to_place])
 
-        if 'futuro' != 'none':
-            magic_count = 0
-            bomb_count = 0
-            for item in pool:
-                if item == 'Magic Upgrade (1/2)':
-                    magic_count += 1
-                if item == 'Bomb Upgrade (+10)':
-                    bomb_count += 2
-            if 'm' in futuro:
-                if 'Magic Upgrade (1/4)' not in pool and magic_count < 2:
-                    pool.append('Magic Upgrade (1/2)')
-            if 'b' in futuro:
-                if bomb_count < 2:
-                    pool.append('Bomb Upgrade (+10)')
-                    pool.append('Bomb Upgrade (+10)')
-                elif bomb_count < 4:
-                    pool.append('Bomb Upgrade (+10)')
+        magic_count = 0
+        bomb_count = 0
+        for item in pool:
+            if item == 'Magic Upgrade (1/2)':
+                magic_count += 1
+            if item == 'Bomb Upgrade (+10)':
+                bomb_count += 1
+        if 'm' in futuro:
+            if 'Magic Upgrade (1/4)' not in pool and magic_count < 2:
+                pool.append('Magic Upgrade (1/2)')
+        if 'b' in futuro:
+            if bomb_count == 0:
+                pool.append('Bomb Upgrade (+10)')
+                pool.append('Bomb Upgrade (+10)')
+            elif bomb_count == 1:
+                pool.append('Bomb Upgrade (+10)')
+        pool.append('Bomb Upgrade (+10)')
 
 
     # Remove starting inventory items from the item pool and replace it with 20 rupees, if suitable and possible.

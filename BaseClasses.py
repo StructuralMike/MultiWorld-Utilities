@@ -625,10 +625,10 @@ class CollectionState(object):
                 self.collect(event.item, True, event)
 
     def has(self, item, player: int, count: int = 1):
-        if self.world.futuro[player]:
+        if 'm' in self.world.futuro[player]:
             magic_items = ['Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Cane of Somaria', 'Cane of Byrna', 'Cape']
             if item in magic_items and self.prog_items['Magic Upgrade (1/2)', player] == 0 and self.prog_items['Magic Upgrade (1/4)', player] == 0:
-                    return False
+                return False
         return self.prog_items[item, player] >= count
 
     def has_key(self, item, player, count: int = 1):
@@ -728,7 +728,10 @@ class CollectionState(object):
                 or self.can_bomb_walls(player))
 
     def can_bomb_walls(self, player: int) -> bool:
-        return ('b' not in self.world.futuro[player] or self.has('Bomb Upgrade (+10)', player) or self.has('Bomb Upgrade (+5)', player, 2))
+        if 'b' not in self.world.futuro[player] or self.has('Bomb Upgrade (+10)', player):
+            return True
+        else:
+            return False
 
     def can_hit_switch(self, player: int) -> bool:
         return (self.can_bomb_walls(player)
