@@ -537,6 +537,7 @@ class World(object):
 
         return False
 
+# Items to test for ability to use magic in has()
 magic_items = ['Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Cane of Somaria', 'Cane of Byrna', 'Cape']
 
 class CollectionState(object):
@@ -724,14 +725,11 @@ class CollectionState(object):
                 or (self.has('Cane of Byrna', player) and (enemies < 6 or self.can_extend_magic(player)))
                 or self.can_shoot_arrows(player)
                 or self.has('Fire Rod', player)
-                or (self.has('Bombs (10)', player) and enemies < 6 and self.can_bomb_walls(player))
-                or self.can_bomb_walls(player))
+                or (self.has('Bombs (10)', player) and enemies < 6 and self.can_bomb_walls(player)) # Standard bomb start
+                or self.can_bomb_walls(player) and enemies < 6)
 
     def can_bomb_walls(self, player: int) -> bool:
-        if 'b' not in self.world.futuro[player] or self.has('Bomb Upgrade (+10)', player):
-            return True
-        else:
-            return False
+        return ('b' not in self.world.futuro[player] or self.has('Bomb Upgrade (+10)', player))
 
     def can_hit_switch(self, player: int) -> bool:
         return (self.can_bomb_walls(player)

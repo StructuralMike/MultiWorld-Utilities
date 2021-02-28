@@ -1396,7 +1396,8 @@ def patch_rom(world, rom, player, team, enemized):
                 equip[0x36D] = min(equip[0x36D] + 0x08, 0xA0)
         else:
             raise RuntimeError(f'Unsupported item in starting equipment: {item.name}')
-
+    
+    # Set basepatch switches for the futuro modes - default = 0x01
     if 'b' in world.futuro[player]:
         rom.write_byte(0x18008D, 0x00)
     if 'm' in world.futuro[player]:
