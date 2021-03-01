@@ -291,7 +291,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Blind Fight', player), lambda state: state.has_key('Small Key (Thieves Town)', player) and state.can_bomb_walls(player))
     set_defeat_dungeon_boss_rule(world.get_location('Thieves\' Town - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Thieves\' Town - Prize', player))
-    set_rule(world.get_location('Thieves\' Town - Big Chest', player), lambda state: (state.has_key('Small Key (Thieves Town)', player) or item_name(state, 'Thieves\' Town - Big Chest', player) == ('Small Key (Thieves Town)', player)) and state.has('Hammer', player))
+    set_rule(world.get_location('Thieves\' Town - Blind\'s Cell', player), lambda state: state.can_kill_most_things(player) or state.can_lift_rocks(player))
+    set_rule(world.get_location('Thieves\' Town - Big Chest', player), lambda state: (state.has_key('Small Key (Thieves Town)', player) or (item_name(state, 'Thieves\' Town - Big Chest', player) == ('Small Key (Thieves Town)', player) and state.can_bomb_walls(player))) and state.has('Hammer', player))
     if world.accessibility[player] != 'locations':
         set_always_allow(world.get_location('Thieves\' Town - Big Chest', player), lambda state, item: item.name == 'Small Key (Thieves Town)' and item.player == player and state.has('Hammer', player))
     set_rule(world.get_location('Thieves\' Town - Attic', player), lambda state: state.has_key('Small Key (Thieves Town)', player))
@@ -440,9 +441,6 @@ def global_rules(world, player):
 
     set_rule(world.get_location('Flute Activation Spot', player), lambda state: state.has('Flute', player))
 
-
-def default_rules(world, player):
-    """Default world rules when world state is not inverted."""
     # bombs or boots requirements
     set_rule(world.get_location("Sahasrahla's Hut - Left", player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
     set_rule(world.get_location("Sahasrahla's Hut - Middle", player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
@@ -450,7 +448,6 @@ def default_rules(world, player):
     set_rule(world.get_location('Sewers - Secret Room - Left', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
     set_rule(world.get_location('Sewers - Secret Room - Middle', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
     set_rule(world.get_location('Sewers - Secret Room - Right', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
-
     set_rule(world.get_entrance('Two Brothers House Exit (West)', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
     set_rule(world.get_entrance('Two Brothers House Exit (East)', player), lambda state: state.can_bomb_walls(player) or state.has_Boots(player))
 
@@ -462,27 +459,17 @@ def default_rules(world, player):
     set_rule(world.get_location('Graveyard Cave', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Paradox Cave Upper - Left', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Paradox Cave Upper - Right', player), lambda state: state.can_bomb_walls(player))
-
     paradox_switch_chests = ['Paradox Cave Lower - Far Left', 'Paradox Cave Lower - Left', 'Paradox Cave Lower - Right', 'Paradox Cave Lower - Far Right', 'Paradox Cave Lower - Middle']
     for location in paradox_switch_chests:
         set_rule(world.get_location(location, player), lambda state: \
                 state.can_bomb_walls(player) or state.can_shoot_arrows(player) or state.has_beam_sword(player) \
                 or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player) \
                 or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
-
     set_rule(world.get_location('Hype Cave - Top', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Hype Cave - Middle Right', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Hype Cave - Middle Left', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Hype Cave - Bottom', player), lambda state: state.can_bomb_walls(player))
     set_rule(world.get_location('Swamp Palace - Map Chest', player), lambda state: state.can_bomb_walls(player))
-
-    set_rule(world.get_entrance('Ice Rod Cave', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_entrance('Light World Bomb Hut', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_entrance('Light World Death Mountain Shop', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_entrance('Hookshot Cave Exit (North)', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_entrance('Turtle Rock Ledge Exit (West)', player), lambda state: state.can_bomb_walls(player))
-    set_rule(world.get_entrance('Mini Moldorm Cave', player), lambda state: state.can_bomb_walls(player))
-
     set_rule(world.get_location('Mini Moldorm Cave - Far Left', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_location('Mini Moldorm Cave - Far Right', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_location('Mini Moldorm Cave - Left', player), lambda state: state.can_kill_most_things(player))
@@ -490,7 +477,18 @@ def default_rules(world, player):
     set_rule(world.get_location('Mini Moldorm Cave - Generous Guy', player), lambda state: state.can_kill_most_things(player))
 
 
+def default_rules(world, player):
+    """Default world rules when world state is not inverted."""
     # overworld requirements
+        # bomb entrances
+    set_rule(world.get_entrance('Ice Rod Cave', player), lambda state: state.can_bomb_walls(player))
+    set_rule(world.get_entrance('Light World Bomb Hut', player), lambda state: state.can_bomb_walls(player))
+    set_rule(world.get_entrance('Light World Death Mountain Shop', player), lambda state: state.can_bomb_walls(player))
+    set_rule(world.get_entrance('Hookshot Cave Exit (North)', player), lambda state: state.can_bomb_walls(player))
+    set_rule(world.get_entrance('Turtle Rock Ledge Exit (West)', player), lambda state: state.can_bomb_walls(player))
+    set_rule(world.get_entrance('Mini Moldorm Cave', player), lambda state: state.can_bomb_walls(player))
+
+        #other
     set_rule(world.get_entrance('Kings Grave', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('Kings Grave Outer Rocks', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Kings Grave Inner Rocks', player), lambda state: state.can_lift_heavy_rocks(player))
@@ -604,6 +602,13 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Castle Ledge S&Q', player), lambda state: state.has_Mirror(player) and state.has('Beat Agahnim 1', player))
 
     # overworld requirements 
+        # bomb entrances
+    set_rule(world.get_entrance('Ice Rod Cave', player), lambda state: state.can_bomb_walls(player) and state.has_Pearl(player))
+    set_rule(world.get_entrance('Light World Bomb Hut', player), lambda state: state.can_bomb_walls(player) and state.has_Pearl(player))
+    set_rule(world.get_entrance('Light World Death Mountain Shop', player), lambda state: state.can_bomb_walls(player) and state.has_Pearl(player))
+    set_rule(world.get_entrance('Hookshot Cave Exit (North)', player), lambda state: state.can_bomb_walls(player))
+    set_rule(world.get_entrance('Mini Moldorm Cave', player), lambda state: state.can_bomb_walls(player) and state.has_Pearl(player))
+        #other
     set_rule(world.get_location('Maze Race', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Mini Moldorm Cave', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Ice Rod Cave', player), lambda state: state.has_Pearl(player))
@@ -888,7 +893,7 @@ def open_rules(world, player):
 def swordless_rules(world, player):
     set_rule(world.get_entrance('Agahnim 1', player), lambda state: (state.has('Hammer', player) or state.has('Fire Rod', player) or state.can_shoot_arrows(player) or state.has('Cane of Somaria', player)) and state.has_key('Small Key (Agahnims Tower)', player, 2))
     set_rule(world.get_entrance('Skull Woods Torch Room', player), lambda state: state.has_key('Small Key (Skull Woods)', player, 3) and state.has('Fire Rod', player))  # no curtain
-    set_rule(world.get_entrance('Ice Palace Entrance Room', player), lambda state: state.has('Fire Rod', player) or state.has('Bombos', player)) #in swordless mode bombos pads are present in the relevant parts of ice palace
+    set_rule(world.get_entrance('Ice Palace Entrance Room', player), lambda state: state.can_bomb_walls(player) and (state.has('Fire Rod', player) or state.has('Bombos', player))) #in swordless mode bombos pads are present in the relevant parts of ice palace
     set_rule(world.get_entrance('Ganon Drop', player), lambda state: state.has('Hammer', player))  # need to damage ganon to get tiles to drop
 
     if world.mode[player] != 'inverted':

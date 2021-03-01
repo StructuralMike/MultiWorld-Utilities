@@ -162,11 +162,11 @@ mode:
 retro:
   on: 0 # you must buy a quiver to use the bow, take-any caves and an old-man cave are added to the world. You may need to find your sword from the old man's cave
   off: 50
-futuro: # Start without bombs and/or magic.b = starting with zero bomb capacity, m = starting with zero magic capacity, bm = both
+futuro: # Start without bombs and/or magic.
   none: 0
-  b: 0
-  m: 0
-  bm: 1
+  b: 0 # starting with zero bomb capacity (Two Bomb Upgrade (+10) are added to the pool)
+  m: 0 # starting with zero magic capacity (One extra Magic Upgrade (1/2) is added to the pool)
+  bm: 1 # both
 hints:
   'on': 50 # Hint tiles sometimes give item location hints
   'off': 0 # Hint tiles provide gameplay tips
@@ -412,6 +412,11 @@ rom:
   reduceflashing: # Reduces instances of flashing such as lightning attacks, weather, ether and more.
     on: 50
     off: 0
+  cutscenespeed: # Reduces time taken to play certain cutscenes, including: water flooding/draining, wall moving, flute activation, for the breezy players
+    normal: 1
+    slow: 0
+    fast: 0
+    blazing: 0
   menuspeed: # Controls how fast the item menu opens and closes
     normal: 50
     instant: 0
