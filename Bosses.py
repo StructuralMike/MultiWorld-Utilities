@@ -40,7 +40,7 @@ def MoldormDefeatRule(state, player: int):
 
 
 def HelmasaurKingDefeatRule(state, player: int):
-    return (state.can_bomb_walls(player) and (state.has_sword(player) or state.can_shoot_arrows(player))) or state.has('Hammer', player)
+    return (state.can_bomb_walls(player) or state.has('Hammer', player)) and (state.has_sword(player) or state.can_shoot_arrows(player))
 
 
 def ArrghusDefeatRule(state, player: int):
